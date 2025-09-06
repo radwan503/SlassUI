@@ -1,0 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "Inter", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 1.5;
+
+  /* Theme Colors */
+  --primary-color: #010d20; /* Example: Deep Blue */
+  --secondary-color: #004fc5; /* Example: Purple */
+  --accent-color: #f97316; /* Example: Orange */
+  --success-color: #16a34a; /* Green */
+  --warning-color: #facc15; /* Yellow */
+  --error-color: #dc2626; /* Red */
+  --light-bg: #ffffff;
+  --dark-bg: #111827;
+  --text-gray: rgba(255, 255, 255, 0.87);
+  --text-slate:rgb(107, 114, 128 ,1);
+  --tab: #06132e42;
+
+
+  color-scheme: light dark;
+  color: var(--text-color);
+  background-color: var(--primary-color);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  overflow: hidden;
+  overflow-y: auto;
+  position: relative;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.animate-shimmer {
+  animation: shimmer 1.5s infinite;
+}
+
