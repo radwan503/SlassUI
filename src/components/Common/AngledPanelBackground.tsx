@@ -67,7 +67,7 @@ export default function AngledPanelBackground() {
         </p>
         <div className="mt-8 flex gap-3">
           <a
-            href="/ui-blocks/"
+            href="/ui-blocks"
             className="rounded-xl bg-indigo-500 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-indigo-500/20 hover:bg-indigo-400"
           >
             Browse Components
