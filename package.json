@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://radwan503.github.io/SlassUI",
+  "homepage": "https://github.com/radwan503/SlassUI",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
