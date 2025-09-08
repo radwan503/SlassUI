@@ -74,10 +74,10 @@ const HeroSectionPage = () => {
           <p className="text-sm font-semibold text-textSlate mb-2 uppercase tracking-wide">
             UI BLOCKS
           </p>
-          <h1 className="text-4xl md:text-5xl font-extrabold text-textColor leading-tight mb-4">
+          <h1 className="text-3xl md:text-4xl font-extrabold text-textColor leading-tight mb-4">
             Hero Sections
           </h1>
-          <p className="text-lg md:text-xl text-textSlate max-w-2xl mt-2">
+          <p className="text-sm md:text-base text-textSlate max-w-4xl mt-2">
             Kickstart your landing pages with{" "}
             <span className="font-semibold">stunning hero sections</span> built with React + Tailwind CSS. Showcase your brand, highlight your product, and guide visitors to take action with beautifully crafted designs.
           </p>

@@ -72,7 +72,7 @@ const TemplatesGridSection = () => {
           <h2 className="text-4xl md:text-5xl font-extrabold text-textColor leading-tight mb-4">
             Design Once. Deploy Everywhere.
           </h2>
-          <p className="text-lg md:text-xl text-textSlate max-w-3xl mx-auto md:mx-0">
+          <p className="text-sm md:text-base text-textSlate max-w-3xl mx-auto md:mx-0">
             Hand-crafted React & Tailwind CSS templates built for speed, style, and scalability.
           </p>
 

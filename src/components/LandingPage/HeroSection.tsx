@@ -16,7 +16,7 @@ const HeroSection = () => {
             </h1>
           </div>
           <div className="md:w-1/2 md:pl-16 mt-8 md:mt-0">
-            <p className="text-lg md:text-xl text-textGray mb-8">
+            <p className="text-sm md:text-base text-textGray mb-8">
               Access <span className="font-semibold text-textColor">149+ pre-built sections</span> —
               from Hero and Pricing to Testimonials and Footers.  
               Copy, paste, and customize with ease using <span className="text-indigo-400 font-semibold">React + TailwindCSS</span>.
@@ -32,7 +32,7 @@ const HeroSection = () => {
                   Browse Components
                 </Button>
               </Link>
-              <Link to="/ui-blocks">
+              <Link to="/template">
                 <Button
                   className="text-darkBg dark:text-gray-200 text-center text-sm"
                   variant="secondary"

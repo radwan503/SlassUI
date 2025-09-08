@@ -24,9 +24,11 @@ const MotionBlock = ({ title = "Block", height = 16, index = 0, loading = false 
     <div className="text-xs uppercase text-slate-400 mb-2">{title}</div>
     {loading ? <Skeleton height={height} /> : (
       <div
-        className="w-full rounded-md bg-slate-800"
+        className="w-full rounded-md bg-slate-800 p-3"
         style={{ height: `${height}rem` }}
-      />
+      >
+      
+      </div>
     )}
   </motion.div>
 );
@@ -68,7 +70,7 @@ export default function UIBlockLayoutSketchAltAnimated() {
         <div className="font-bold text-lg">Alt UI Sketch</div>
         <button
           onClick={() => setSidebar((s) => !s)}
-          className="px-3 py-1 rounded-md border border-slate-700 bg-slate-800 hover:bg-slate-700 transition"
+          className="text-lg px-3 py-1 rounded-md border border-slate-700 bg-slate-800 hover:bg-slate-700 transition"
         >
           {sidebar ? "Hide Sidebar" : "Show Sidebar"}
         </button>

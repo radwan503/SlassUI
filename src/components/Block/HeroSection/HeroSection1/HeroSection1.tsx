@@ -127,9 +127,9 @@ const HeroSection1 = () => {
       <FloatingIcon icon={Rocket} className="bottom-8 right-12 sm:bottom-12 sm:right-24" delay={3000} />
 
       {/* Content */}
-      <div className="container mx-auto relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center ">
+      <div className="container py-4 lg:py-0 mx-auto relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center ">
         {/* Left Text Section */}
-        <div className="text-center lg:text-left pl-4 sm:pl-6 lg:pl-16">
+        <div className="text-center lg:text-left px-1 sm:pl-6 lg:pl-16">
           <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 leading-tight mb-6">
             Greatr Team
             <br />

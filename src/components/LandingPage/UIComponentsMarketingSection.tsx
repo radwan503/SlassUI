@@ -22,7 +22,7 @@ const UIComponentsTabbedSection = () => {
         </h2>
 
         {/* Subtext */}
-        <p className="text-lg md:text-xl text-textSlate max-w-2xl text-left mb-12">
+        <p className="text-lg md:text-base text-textSlate max-w-2xl text-left mb-12">
           Explore a growing collection of 149+ hand-crafted, production-ready components. 
           Save hours of design and development time while keeping full creative control with Tailwind CSS.
         </p>
@@ -34,7 +34,7 @@ const UIComponentsTabbedSection = () => {
               key={key}
               onClick={() => setActiveTab(key)}
               className={`
-                py-3 px-6 text-lg font-semibold border-l border-darkBg
+                py-3 px-6 text-base font-semibold border-l border-darkBg
                 ${activeTab === key
                   ? 'text-textColor bg-darkBg border border-grayBg'
                   : 'text-textSlate hover:text-gray-700'}
@@ -60,7 +60,7 @@ const UIComponentsTabbedSection = () => {
 
         {/* CTA Button */}
         <div className="flex justify-center mt-12">
-          <Button variant="primary" size="lg" icon={ArrowRight}>
+          <Button className="text-base" variant="primary" size="lg" icon={ArrowRight}>
             Browse full library
           </Button>
         </div>

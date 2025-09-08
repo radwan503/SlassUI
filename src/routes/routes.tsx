@@ -11,7 +11,7 @@ const routes = [
   },
   {
     path: "/ui-blocks",
-    layout: HomeLayout,
+    layout: MainLayout,
     component: lazy(() => import("../pages/UIBlocks")),
   },
   {
@@ -24,6 +24,12 @@ const routes = [
     layout: MainLayout,
     component: lazy(() => import("../pages/Blocks/FeatureSection/FeatureSection")),
   },
+  {
+    path: "/template",
+    layout: MainLayout,
+    component: lazy(() => import("../pages/Template/Template")),
+  },
+  
 ];
 
 export default routes;

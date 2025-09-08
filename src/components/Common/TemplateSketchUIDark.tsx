@@ -131,6 +131,53 @@ function FeatureGrid() {
   );
 }
 
+function Testimonials() {
+  const testimonials = [
+    {
+      name: "Amina R.",
+      role: "Product Designer",
+      text: "SketchKit helped me spin up a landing page in minutes. The motion effects are clean and modern.",
+    },
+    {
+      name: "David K.",
+      role: "Frontend Engineer",
+      text: "The components are lightweight but flexible. Saved me hours when prototyping ideas.",
+    },
+    {
+      name: "Sophia L.",
+      role: "Founder",
+      text: "Loved the built-in animations. It feels premium right out of the box!",
+    },
+  ];
+
+  return (
+    <section className="mt-12">
+      <h2 className="text-2xl font-bold text-white text-center">
+        What people are saying
+      </h2>
+      <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {testimonials.map((t, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: i * 0.15 }}
+            viewport={{ once: true }}
+            className="p-6 rounded-xl border border-gray-700 bg-gray-800 shadow-md"
+          >
+            <p className="text-gray-300 italic">“{t.text}”</p>
+            <div className="mt-4">
+              <div className="font-semibold text-white">{t.name}</div>
+              <div className="text-sm text-gray-400">{t.role}</div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+
 function Footer() {
   return (
     <footer className="mt-12 py-6 border-t border-gray-700">
@@ -152,6 +199,7 @@ export default function TemplateSketchUIDark() {
         <Navbar />
         <Hero />
         <FeatureGrid />
+        <Testimonials />
         <Footer />
       </div>
     </div>

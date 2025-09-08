@@ -1,9 +1,10 @@
 import React from "react";
-import ComponentPreviewCard from "../components/LandingPage/ComponentPreviewCard";
-import { elements, pageSections } from "../data/Blocks";
 import { Link } from "react-router";
 
-const UIBlocks = () => {
+import TemplatePreviewCard from "../../components/TemplatePage/TemplatePreviewCard";
+import { elements, templateData } from "../../data/templateData";
+
+const TemplatePage = () => {
 
   return (
     <React.Fragment>
@@ -11,15 +12,12 @@ const UIBlocks = () => {
         <div className="container mx-auto px-4 text-center md:text-left relative z-10">
           {/* Top Section Header */}
           <div className="mb-12">
-            <p className="text-sm font-semibold text-textSlate mb-2 uppercase tracking-wide">
-              UI BLOCKS
-            </p>
+            
             <h1 className="text-3xl md:text-4xl font-extrabold text-textColor leading-tight mb-4">
-              Beautifully Crafted Components
+              SlassUI Templates
             </h1>
-            <p className="text-sm md:text-base text-textSlate max-w-2xl">
-              Explore a growing library of <span className="font-semibold">149+ responsive, production-ready components</span> built with React + Tailwind CSS. 
-              Copy, paste, and customize with ease — no design skills required.
+            <p className="text-sm md:text-base text-textSlate max-w-4xl">
+              Explore our collection of SlassUI React templates to jumpstart your app development. Choose from a range of designs, like our React home page and landing page templates, to build your project faster.
             </p>
           </div>
 
@@ -29,14 +27,16 @@ const UIBlocks = () => {
             <h2 className="text-base font-semibold text-textSlate mb-6 uppercase tracking-wide">
               SECTIONS
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {pageSections.map((section, index) => (
-              <Link key={section.title} to={section.link}>
-                  <ComponentPreviewCard
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3a 2xl:grid-cols-4 gap-6">
+              {templateData.map((section:any, index:any) => (
+              <Link key={section.title} target="_blank" to={section.liveLink}>
+                  <TemplatePreviewCard
                     key={index}
                     image={section.image}
                     title={section.title}
-                    count={section.count}
+                    subtitle={section.subtitle}
+                    githubRepo={section.githubLink}
+                    liveLink={section.liveLink}
                   />
                 </Link>
               ))}
@@ -50,12 +50,14 @@ const UIBlocks = () => {
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {elements.map((element, index) => (
-                 <Link key={element.title} to={element.link}>
-                  <ComponentPreviewCard
+                 <Link key={element.title} to={element.liveLink}>
+                  <TemplatePreviewCard
                     key={index}
                     image={element.image}
                     title={element.title}
-                    count={element.count}
+                    subtitle={element.subtitle}
+                    githubRepo={element.githubLink}
+                    liveLink={element.liveLink}
                   />
                 </Link>
               ))}
@@ -67,4 +69,4 @@ const UIBlocks = () => {
   );
 };
 
-export default UIBlocks;
+export default TemplatePage;

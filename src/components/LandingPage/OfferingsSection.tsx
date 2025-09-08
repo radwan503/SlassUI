@@ -40,16 +40,16 @@ const OfferingsSection = () => {
       <div className="container mx-auto px-4 text-center md:text-left relative z-10">
         <div className="bg-primary dark:bg-gray-800 rounded-0 shadow-lg overflow-hidden">
           {/* Tab navigation buttons */}
-          <div className="flex justify-center border-b border-darkBg dark:border-gray-700 bg-primary dark:bg-gray-700 rounded-0">
+          <div className="flex justify-center bg-primary rounded-0">
             {tabs.map((tab) => (
               <div
                 key={tab.id}
                 className={`
-                  flex-1 py-4 px-6 text-left text-lg font-normal transition-all duration-300 ease-in-out
+                  flex-1 py-4 px-6 text-left text-lg
                   ${
                     activeTab === tab.id
                       ? 'border-b border-darkBg text-indigo-400 dark:text-indigo-400 bg-tab dark:bg-gray-800'
-                      : 'text-textSlate dark:text-gray-300 hover:text-indigo-400 hover:bg-tab dark:hover:bg-gray-600'
+                      : 'text-white dark:text-gray-300 hover:text-indigo-400 hover:bg-tab dark:hover:bg-gray-600'
                   }
                   focus:outline-none rounded-0
                 `}
@@ -71,22 +71,22 @@ const OfferingsSection = () => {
           </div>
 
           {/* Tab content */}
-          <div className="p-6 pb-20 bg-tab">
+          <div className="p-6  bg-tab">
             {tabs.map((tab) => (
               <div key={tab.id} className={`${activeTab === tab.id ? 'block' : 'hidden'}`}>
-                <h2 className="text-2xl font-bold text-textColor dark:text-gray-100 mb-6 text-center">
+                {/* <h2 className="text-2xl font-bold text-textColor dark:text-gray-100 mb-6 text-center">
                   {tab.name}
-                </h2>
+                </h2> */}
                 <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 gap-6">
                     <div
                       className="bg-slate-950 dark:bg-gray-700 rounded-lg shadow-md overflow-hidden transform transition-transform duration-300"
                     >
                       {tab.components}
-                      <div className="p-4 bg-primary">
+                      {/* <div className="p-4 bg-primary">
                         <p className="text-gray-500 dark:text-gray-200 text-center text-sm">
                           {tab.name} Example
                         </p>
-                      </div>
+                      </div> */}
                     </div>
                  
                 </div>

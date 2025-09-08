@@ -43,10 +43,10 @@ const FeatureSectionPage = () => {
             <p className="text-sm font-semibold text-textSlate mb-2 uppercase tracking-wide">
               UI BLOCKS
             </p>
-            <h1 className="text-4xl md:text-5xl font-extrabold text-textColor leading-tight mb-4">
+            <h1 className="text-3xl md:text-4xl font-extrabold text-textColor leading-tight mb-4">
               Feature Sections
             </h1>
-            <p className="text-lg md:text-xl text-textSlate max-w-2xl mt-2">
+            <p className="text-sm md:text-base text-textSlate max-w-4xl mt-2">
               Use these Tailwind CSS feature section examples to highlight the most important features of your product or service. These examples are designed and built by the Tailwind CSS team, and include a variety of different styles and layouts.
             </p>
           </div>

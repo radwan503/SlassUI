@@ -57,13 +57,20 @@ const Placeholder = ({ title }: { title: string }) => {
 };
 
 const ComponentPreviewCard = ({ title, count, category }: any) => (
-  <div className="bg-darkBg rounded-xl shadow-md overflow-hidden group flex flex-col border border-white/5 hover:border-blue-500/40 hover:shadow-indigo-500/20 transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl hover:scale-[1.02] animate-float">
+  <div
+    className="bg-darkBg rounded-xl overflow-hidden group flex flex-col border border-white/5 hover:border-blue-500/40 transition-all duration-500 animate-float"
+    style={{
+      boxShadow: "10px 10px 0 #243a56",
+      transform: "translate(-1px, -1px)",
+      transition: ".3s ease-in-out",
+    }}
+  >
     {/* Unique placeholder */}
     <Placeholder title={title} />
 
     {/* Content */}
     <div className="p-4 flex-grow">
-      <h3 className="text-lg font-semibold text-textColor group-hover:text-indigo-400 transition-colors duration-500">
+      <h3 className="text-base font-semibold text-textColor transition-colors duration-500">
         {title}
       </h3>
       {count && <p className="text-sm text-gray-500">{count} components</p>}
@@ -71,5 +78,6 @@ const ComponentPreviewCard = ({ title, count, category }: any) => (
     </div>
   </div>
 );
+
 
 export default ComponentPreviewCard;

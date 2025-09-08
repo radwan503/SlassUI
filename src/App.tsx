@@ -3,11 +3,12 @@ import { Routes, Route } from "react-router";
 import routes from "./routes/routes";
 import './App.css';
 import { ThemeProvider } from "./utils/ThemeContext";
+import Loader from "./components/Common/Loader";
 
 function App() {
   return (
     <ThemeProvider>
-      <Suspense fallback={<div className="p-6 text-center">Loading...</div>}>
+      <Suspense fallback={<Loader/>}>
         <Routes>
           {routes.map(({ path, component: Component, layout: Layout }) => (
             <Route
