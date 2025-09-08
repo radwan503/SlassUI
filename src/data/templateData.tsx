@@ -2,14 +2,14 @@ const templateData = [
   { 
     title: 'Lead Deck', 
     subtitle: 'LeadDeck - Modern Lead Capture Landing Page', 
-    image: '../../public/template/leaddeck.png',
+    image: '../../template/leaddeck.png',
     liveLink: 'https://radwan503.github.io/LeadDeck/',
     githubLink: 'https://github.com/radwan503/LeadDeck' 
   },
   { 
     title: 'Frog X', 
     subtitle: 'Discover Frog X - a beautiful React + Tailwind UI component set with gradient hover effects and responsive grids ', 
-    image: '../../public/template/frogx.png',
+    image: '../../template/frogx.png',
     liveLink: 'https://radwan503.github.io/FrogX/',
     githubLink: 'https://github.com/radwan503/FrogX' 
   },
