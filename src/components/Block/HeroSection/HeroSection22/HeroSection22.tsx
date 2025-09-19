@@ -1,161 +1,296 @@
-import { UserCog, ShoppingCart, ChartLine, Rocket, Blocks, ShieldCheck, Award } from "lucide-react";
+// /components/HeroSectionModern.tsx
+import { useMemo } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import {
+  UserCog,
+  ShoppingCart,
+  ChartLine,
+  Rocket,
+  Blocks,
+  ShieldCheck,
+  Award,
+} from "lucide-react";
 
-const FloatingIcon = ({ icon: Icon, className, delay }: any) => (
-  <div
-    className={`absolute text-white/50 opacity-40 z-30 ${className} animate-float`}
-    style={{ animationDelay: `${delay}ms` }}
-  >
-    <Icon className="w-10 h-10 md:w-12 md:h-12 drop-shadow-xl" />
+// --- Utility: classNames ---
+function cn(...classes: (string | false | null | undefined)[]) {
+  return classes.filter(Boolean).join(" ");
+}
+
+// --- Decorative Backdrop ---
+const Backdrop = () => (
+  <>
+    {/* Radial mesh gradient "ink blots" */}
+    <div className="pointer-events-none absolute inset-0 -z-10">
+      <div className="absolute -top-24 -left-16 h-80 w-80 rounded-full bg-pink-500/20 blur-3xl" />
+      <div className="absolute top-1/3 -right-10 h-96 w-96 rounded-full bg-indigo-500/20 blur-3xl" />
+      <div className="absolute bottom-10 right-1/4 h-80 w-80 rounded-full bg-purple-500/20 blur-3xl" />
+      <div className="absolute inset-0 bg-[radial-gradient(75rem_50rem_at_120%_-10%,rgba(255,255,255,0.07),transparent)]" />
+      {/* Subtle grid */}
+      <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(to_right,rgba(255,255,255,0.2)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.2)_1px,transparent_1px)] [background-size:40px_40px]" />
+      {/* Noise */}
+      <div className="absolute inset-0 opacity-[0.06] mix-blend-overlay [background-image:url('data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><filter id=\'n\'><feTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'2\' stitchTiles=\'stitch\'/></filter><rect width=\'100%\' height=\'100%\' filter=\'url(%23n)\' opacity=\'0.3\'/></svg>')]" />
+    </div>
+  </>
+);
+
+// --- Floating Icon ---
+const FloatingIcon = ({
+  Icon,
+  className,
+  delay = 0,
+}: {
+  Icon: any;
+  className?: string;
+  delay?: number;
+}) => {
+  const reduce = useReducedMotion();
+  return (
+    <motion.div
+      aria-hidden
+      className={cn("absolute z-10 text-white/50 drop-shadow-xl", className)}
+      initial={{ y: 0, rotate: 0, opacity: 0 }}
+      animate={{
+        y: reduce ? 0 : [0, -10, 0],
+        rotate: reduce ? 0 : [0, 6, 0],
+        opacity: 0.35,
+      }}
+      transition={{
+        duration: 6,
+        repeat: reduce ? 0 : Infinity,
+        delay: delay / 1000,
+        ease: "easeInOut",
+      }}
+    >
+      <Icon className="h-10 w-10 md:h-12 md:w-12" />
+    </motion.div>
+  );
+};
+
+// --- Sparkline (inline SVG) ---
+const Sparkline = () => (
+  <svg viewBox="0 0 500 160" className="h-24 w-full" preserveAspectRatio="none">
+    <defs>
+      <linearGradient id="g" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stopColor="white" stopOpacity="0.9" />
+        <stop offset="100%" stopColor="white" stopOpacity="0.5" />
+      </linearGradient>
+    </defs>
+    <path
+      d="M0,120 C60,40 120,140 180,80 240,20 300,140 360,60 420,20 480,150 500,130"
+      fill="none"
+      stroke="url(#g)"
+      strokeWidth="6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <circle cx="500" cy="130" r="8" fill="#fff" />
+  </svg>
+);
+
+// --- Stat Chip ---
+const StatChip = ({
+  icon: Ico,
+  color,
+  label,
+  value,
+}: {
+  icon: any;
+  color: string; // Tailwind bg-* class
+  label: string;
+  value: string;
+}) => (
+  <div className="group flex flex-col items-center rounded-2xl bg-white/5 p-4 ring-1 ring-white/10 backdrop-blur transition hover:bg-white/10">
+    <div className={cn("mb-2 flex h-12 w-12 items-center justify-center rounded-full shadow-lg", color)}>
+      <Ico className="h-6 w-6 text-white" />
+    </div>
+    <p className="text-lg font-semibold text-white">{value}</p>
+    <p className="text-xs text-white/70">{label}</p>
   </div>
 );
 
+// --- Stats Card ---
 const StatsCard = () => {
   return (
-    <div className="backdrop-blur-xl bg-gradient-to-br from-white/10 via-white/5 to-transparent border border-white/20 shadow-[0_0_30px_rgba(0,0,0,0.4)] rounded-3xl p-6 md:p-8 flex flex-col relative w-full max-w-lg mx-auto hover:scale-105 transition-transform duration-500">
+    <div className="relative w-full max-w-xl rounded-3xl border border-white/15 bg-white/10 p-6 shadow-[0_0_30px_rgba(0,0,0,0.35)] backdrop-blur-xl sm:p-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-base font-semibold text-white tracking-wide flex items-center gap-2">
-          <ShieldCheck className="w-4 h-4 text-green-400" /> Active Users ✨
+      <div className="mb-6 flex items-center justify-between">
+        <h3 className="flex items-center gap-2 text-sm font-semibold tracking-wide text-white">
+          <ShieldCheck className="h-4 w-4 text-emerald-300" /> Active Users ✨
         </h3>
-        <span className="px-3 py-1 text-xs bg-green-400/20 text-green-300 rounded-full border border-green-400/30">
+        <span className="rounded-full border border-emerald-400/40 bg-emerald-400/15 px-3 py-1 text-xs text-emerald-200">
           Live
         </span>
       </div>
 
       {/* Graph + Value */}
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
-        <div className="flex-1 flex flex-col items-center justify-center p-4 rounded-xl bg-white/10 border border-white/10 backdrop-blur-lg">
-          <p className="text-3xl md:text-4xl font-extrabold text-white">478</p>
-          <p className="text-sm text-gray-200 text-center">Page views/min</p>
+      <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-white/10 p-5 text-center">
+          <p className="text-4xl font-extrabold text-white md:text-5xl">478</p>
+          <p className="text-xs text-white/70">Page views / min</p>
         </div>
-        <div className="flex-1 p-4 rounded-xl bg-indigo-600/40 border border-white/20 backdrop-blur-lg relative">
-          <svg className="w-full h-24" viewBox="0 0 500 200" preserveAspectRatio="none">
-            <path
-              d="M0,100 C125,10 250,150 375,50 500,190"
-              fill="none"
-              stroke="#fff"
-              strokeWidth="5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <circle cx="478" cy="188" r="8" fill="#fff" stroke="#fff" strokeWidth="2" />
-          </svg>
+        <div className="relative overflow-hidden rounded-2xl border border-white/15 bg-indigo-600/40 p-3">
+          <Sparkline />
+          <div className="absolute right-3 top-3 rounded-full bg-white/20 px-2 py-1 text-[10px] font-medium text-white/90">
+            +12.4%
+          </div>
         </div>
       </div>
 
-      {/* Stats row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      {/* Stats Row */}
+      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
         {[
           { icon: UserCog, color: "bg-blue-500", label: "Users", value: "36K" },
           { icon: ShoppingCart, color: "bg-pink-500", label: "Clicks", value: "1M" },
           { icon: ChartLine, color: "bg-green-500", label: "Sales", value: "25K" },
           { icon: Rocket, color: "bg-orange-500", label: "Items", value: "25K" },
-        ].map((stat, i) => (
-          <div key={i} className="flex flex-col items-center">
-            <div className={`w-12 h-12 rounded-full ${stat.color} flex items-center justify-center mb-2 shadow-lg`}>
-              <stat.icon className="text-white w-6 h-6" />
-            </div>
-            <p className="font-bold text-lg text-white">{stat.value}</p>
-            <p className="text-xs text-gray-300">{stat.label}</p>
-          </div>
+        ].map((s, i) => (
+          <StatChip key={i} icon={s.icon} color={s.color} label={s.label} value={s.value} />
         ))}
       </div>
 
-      <p className="text-xs text-gray-300 text-center italic">
-        Trusted by <span className="text-indigo-300 font-medium">10,000+ companies</span> worldwide 🌍
+      <p className="text-center text-xs italic text-white/70">
+        Trusted by <span className="font-medium text-indigo-200">10,000+ companies</span> worldwide 🌍
       </p>
+
+      {/* Glow ring */}
+      <div className="pointer-events-none absolute -inset-0.5 -z-10 rounded-3xl bg-gradient-to-b from-white/10 to-transparent blur-2xl" />
     </div>
   );
 };
 
-const HeroSection22 = () => {
+// --- Main Hero ---
+export default function HeroSectionModern() {
+
+  // Floating icons map ensures stable keys & easy edits
+  const floaters = useMemo(
+    () => [
+      { Icon: UserCog, className: "top-10 left-4 sm:top-16 sm:left-14" },
+      { Icon: ShoppingCart, className: "top-1/4 right-4 sm:right-16" },
+      { Icon: Blocks, className: "bottom-1/2 left-8 sm:left-36" },
+      { Icon: Rocket, className: "bottom-10 right-10 sm:bottom-14 sm:right-24" },
+    ],
+    []
+  );
+
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-indigo-950 via-purple-900 to-gray-900 text-white">
-      {/* Blobs */}
-      <div className="absolute top-1/4 left-1/4 w-40 h-40 bg-pink-500/30 rounded-full blur-3xl animate-blob"></div>
-      <div className="absolute bottom-1/3 right-1/4 w-56 h-56 bg-blue-500/30 rounded-full blur-3xl animate-blob animation-delay-2000"></div>
-      <div className="absolute top-1/2 right-1/3 w-32 h-32 bg-purple-500/30 rounded-full blur-3xl animate-blob animation-delay-4000"></div>
+    <section className="relative overflow-hidden bg-gradient-to-br from-[#0b1020] via-[#14122a] to-[#0e0e17] text-white">
+      <Backdrop />
 
-      {/* Floating icons */}
-      <FloatingIcon icon={UserCog} className="top-8 left-6 sm:top-16 sm:left-12" delay={0} />
-      <FloatingIcon icon={ShoppingCart} className="top-1/4 right-6 sm:right-16" delay={1000} />
-      <FloatingIcon icon={Blocks} className="bottom-1/2 left-8 sm:left-40" delay={2000} />
-      <FloatingIcon icon={Rocket} className="bottom-8 right-12 sm:bottom-12 sm:right-24" delay={3000} />
+      {/* Floating Icons */}
+      {floaters.map((f, idx) => (
+        <FloatingIcon key={idx} Icon={f.Icon} className={f.className} delay={idx * 900} />
+      ))}
 
-      {/* Content */}
-      <div className="container mx-auto relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center px-6 py-20">
-        {/* Left */}
+      <div className="container relative z-20 mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-6 py-20 lg:grid-cols-2 lg:gap-16">
+        {/* Left Column */}
         <div className="text-center lg:text-left">
-          <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6 bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300 bg-clip-text text-transparent">
-            Build Smarter. <br /> Grow Faster
-          </h1>
-          <p className="text-lg text-gray-200 max-w-xl mx-auto lg:mx-0 mb-6">
-            Empower your team with modern analytics, real-time insights, and a design system built for growth.  
-            Experience the <span className="text-indigo-300 font-semibold">next-gen glass UI</span>.
-          </p>
+          <motion.h1
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            viewport={{ once: true }}
+            className="mb-6 bg-gradient-to-r from-indigo-200 via-purple-200 to-pink-200 bg-clip-text text-4xl font-extrabold leading-tight text-transparent md:text-6xl"
+          >
+            Build Smarter. <br className="hidden sm:block" /> Grow Faster
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
+            viewport={{ once: true }}
+            className="mx-auto mb-8 max-w-xl text-balance text-base text-white/80 md:text-lg lg:mx-0"
+          >
+            Empower your team with modern analytics, real-time insights, and a design system built for growth. Experience the
+            <span className="font-semibold text-indigo-200"> next‑gen glass UI</span>.
+          </motion.p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-8 justify-center lg:justify-start">
-            <button className="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-medium shadow-lg transition">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.15, ease: "easeOut" }}
+            viewport={{ once: true }}
+            className="mb-8 flex flex-col items-center gap-4 sm:flex-row lg:justify-start"
+          >
+            <button
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 font-medium text-white shadow-lg ring-1 ring-white/10 transition hover:translate-y-[-1px] hover:bg-indigo-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 active:translate-y-[0]"
+            >
               Get Started Free
             </button>
-            <button className="px-6 py-3 rounded-xl border border-white/30 bg-white/10 hover:bg-white/20 text-white font-medium shadow-lg transition">
+            <button
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/10 px-6 py-3 font-medium text-white shadow-lg transition hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+            >
               Watch Demo
             </button>
-          </div>
+          </motion.div>
 
           {/* Newsletter */}
-          <div className="max-w-md mx-auto lg:mx-0 backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl p-6 shadow-lg">
-            <p className="text-gray-300 mb-4">
-              Join <span className="text-indigo-300 font-semibold">50k+ subscribers</span> & unlock exclusive features.
+          <motion.form
+            onSubmit={(e) => e.preventDefault()}
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+            viewport={{ once: true }}
+            className="mx-auto max-w-md rounded-2xl border border-white/15 bg-white/10 p-4 shadow-lg backdrop-blur lg:mx-0"
+          >
+            <p className="mb-3 text-sm text-white/80">
+              Join <span className="font-semibold text-indigo-200">50k+ subscribers</span> & unlock exclusive features.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <label className="sr-only" htmlFor="hero-email">
+                Email address
+              </label>
               <input
+                id="hero-email"
                 type="email"
-                placeholder="Email address"
-                className="flex-grow px-4 py-3 rounded-xl border border-white/20 bg-white/10 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                inputMode="email"
+                autoComplete="email"
+                required
+                placeholder="you@company.com"
+                className="flex-1 rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-sm text-white placeholder-white/50 outline-none transition focus:border-indigo-300 focus:ring-2 focus:ring-indigo-300/40"
               />
-              <button className="px-6 py-3 rounded-xl bg-indigo-600/80 hover:bg-indigo-600 text-white font-medium transition-colors duration-200">
+              <button
+                type="submit"
+                className="rounded-xl bg-indigo-600/90 px-6 py-3 text-sm font-semibold text-white transition hover:bg-indigo-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300"
+              >
                 Subscribe
               </button>
             </div>
-          </div>
+          </motion.form>
 
-          {/* Trust Badges */}
-          <div className="flex items-center justify-center lg:justify-start gap-6 mt-6 opacity-80">
-            <Award className="w-6 h-6 text-yellow-400" />
-            <p className="text-sm text-gray-300">Award-winning UI & Analytics Platform</p>
+          {/* Trust Badge */}
+          <div className="mt-6 flex items-center justify-center gap-3 opacity-90 lg:justify-start">
+            <Award className="h-5 w-5 text-yellow-300" />
+            <p className="text-sm text-white/70">Award‑winning UI & Analytics Platform</p>
           </div>
         </div>
 
-        {/* Right */}
-        <div className="relative flex justify-center lg:justify-end items-center">
-          <div className="absolute top-1/2 left-1/2 lg:left-[55%] -translate-x-1/2 -translate-y-1/2 w-full max-w-sm lg:max-w-lg">
-            <StatsCard />
-          </div>
+        {/* Right Column */}
+        <div className="relative flex items-center justify-center lg:justify-end">
+          {/* Tilt wrapper */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            viewport={{ once: true }}
+            className="relative w-full max-w-sm sm:max-w-md lg:max-w-lg"
+          >
+            <div className="relative">
+              <div className="absolute -inset-8 -z-10 rounded-[2rem] bg-gradient-to-tr from-indigo-500/30 via-fuchsia-500/20 to-emerald-400/20 blur-2xl" />
+              <StatsCard />
+            </div>
+          </motion.div>
         </div>
       </div>
 
-      {/* Floating animation */}
+      {/* Reduce motion friendly keyframes (fallback) */}
       <style>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0) rotate(0deg); }
-          50% { transform: translateY(-15px) rotate(5deg); }
-        }
-        .animate-float {
-          animation: float 6s ease-in-out infinite;
-        }
-        .animate-blob {
-          animation: blob 12s infinite;
-        }
-        @keyframes blob {
-          0%, 100% { transform: translate(0px, 0px) scale(1); }
-          33% { transform: translate(30px, -50px) scale(1.1); }
-          66% { transform: translate(-20px, 20px) scale(0.9); }
+        @media (prefers-reduced-motion: no-preference) {
+          .float-slow { animation: float 6s ease-in-out infinite; }
+          @keyframes float { 0%,100%{ transform: translateY(0) } 50%{ transform: translateY(-10px) } }
         }
       `}</style>
     </section>
   );
-};
-
-export default HeroSection22;
+}

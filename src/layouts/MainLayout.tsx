@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
+import Footer from "../components/Footer";
 
 const MainLayout = ({ children }: any) => {
   const [sidebarOpen, setSidebarOpen] = useState(true); // Default open for large screens
@@ -48,6 +49,7 @@ const MainLayout = ({ children }: any) => {
         style={{ height: "calc(100vh - 0px)" }}
       >
         {children}
+        <Footer />
       </main>
     </div>
   );

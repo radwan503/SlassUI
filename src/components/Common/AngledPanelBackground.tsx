@@ -1,5 +1,16 @@
 import React from "react";
-
+import { Link } from "react-router";
+import {
+  ArrowRight,
+  Sparkles,
+  CheckCircle2,
+  Gauge,
+  Layers,
+  ShieldCheck,
+  PlugZap,
+  PlayCircle,
+  Github,
+} from "lucide-react";
 
 export default function AngledPanelBackground() {
   const vars: React.CSSProperties = {
@@ -18,89 +29,320 @@ export default function AngledPanelBackground() {
   } as React.CSSProperties;
 
   return (
-    <section
-  className="relative overflow-hidden bg-[var(--bg)] text-slate-200 antialiased"
-  style={vars}
->
-  {/* Decorative glows */}
-  <div
-    className="pointer-events-none absolute -top-40 -left-36 h-96 w-96 rounded-full"
-    style={{ background: "var(--glow-cyan)", filter: "blur(64px)" }}
-  />
-  <div
-    className="pointer-events-none absolute -bottom-40 -right-40 h-[28rem] w-[28rem] rounded-full"
-    style={{ background: "var(--glow-indigo)", filter: "blur(72px)" }}
-  />
+    <section className="relative overflow-hidden bg-[var(--bg)] text-slate-200 antialiased" style={vars}>
+      {/* Tiny helpers */}
+      <style>{`
+        @keyframes float { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-6px) } }
+        @keyframes sheen { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
+        .tilt:hover { transform: perspective(1000px) rotateX(2deg) rotateY(-3deg) translateY(-2px); }
+      `}</style>
 
-  {/* Left & Right rails with hatch pattern + vertical labels */}
-  <aside className="pointer-events-none fixed left-0 top-0 z-10 hidden h-screen w-16 sm:block sm:w-20 lg:w-24">
-    <div className="absolute inset-0 border-r border-white/10 opacity-80" style={railHatchStyle} />
-    <div className="absolute bottom-24 left-1/2 -translate-x-1/2 -rotate-90 select-none text-[10px] uppercase tracking-[0.35em] text-slate-400/70">
-      Components
-    </div>
-  </aside>
+      {/* Decorative glows */}
+      <div className="pointer-events-none absolute -top-40 -left-36 h-96 w-96 rounded-full"
+           style={{ background: "var(--glow-cyan)", filter: "blur(64px)" }} />
+      <div className="pointer-events-none absolute -bottom-40 -right-40 h-[28rem] w-[28rem] rounded-full"
+           style={{ background: "var(--glow-indigo)", filter: "blur(72px)" }} />
 
-  <aside className="pointer-events-none fixed right-0 top-0 z-10 hidden h-screen w-16 sm:block sm:w-20 lg:w-24">
-    <div className="absolute inset-0 border-l border-white/10 opacity-80" style={railHatchStyle} />
-    <div className="absolute bottom-24 left-1/2 -translate-x-1/2 -rotate-90 select-none text-[10px] uppercase tracking-[0.35em] text-slate-400/70">
-      Tailwind
-    </div>
-  </aside>
-
-  {/* Content container padded so it doesn't sit beneath rails */}
-  <div className="relative z-20 mx-auto container px-4">
-    <div className="pt-16 sm:pt-24 lg:pt-28" />
-
-    {/* HERO */}
-    <div className="relative grid grid-cols-1 items-center gap-10 lg:grid-cols-2">
-      <div>
-        <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-slate-300">
-          React + Tailwind
-        </span>
-        <h1 className="mt-6 text-4xl font-bold tracking-tight text-white sm:text-6xl">
-          149+ Ready-to-Use Components <br /> for Modern Web Apps
-        </h1>
-        <p className="mt-6 max-w-xl text-textSlate">
-          Stop reinventing the wheel. Build faster with pre-designed, production-ready 
-          sections like Heroes, Pricing, Testimonials, and more — all crafted with 
-          <span className="text-indigo-400 font-semibold"> React & TailwindCSS</span>.
-        </p>
-        <div className="mt-8 flex gap-3">
-          <a
-            href="/ui-blocks"
-            className="rounded-xl bg-indigo-500 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-indigo-500/20 hover:bg-indigo-400"
-          >
-            Browse Components
-          </a>
-          <a
-            href="/template"
-            className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-slate-200 hover:bg-white/10"
-          >
-            View Template
-          </a>
+      {/* Left & Right rails with hatch pattern + vertical labels */}
+      <aside className="pointer-events-none fixed left-0 top-0 z-10 hidden h-screen w-16 sm:block sm:w-20 lg:w-24">
+        <div className="absolute inset-0 border-r border-white/10 opacity-80" style={railHatchStyle} />
+        <div className="absolute bottom-24 left-1/2 -translate-x-1/2 -rotate-90 select-none text-[10px] uppercase tracking-[0.35em] text-slate-400/70">
+          Components
         </div>
-      </div>
+      </aside>
+      <aside className="pointer-events-none fixed right-0 top-0 z-10 hidden h-screen w-16 sm:block sm:w-20 lg:w-24">
+        <div className="absolute inset-0 border-l border-white/10 opacity-80" style={railHatchStyle} />
+        <div className="absolute bottom-24 left-1/2 -translate-x-1/2 -rotate-90 select-none text-[10px] uppercase tracking-[0.35em] text-slate-400/70">
+          Tailwind
+        </div>
+      </aside>
 
-      {/* Right-side rotated collage (decorative) */}
-      <div aria-hidden className="pointer-events-none relative hidden lg:block">
-        <div className="absolute -right-10 -top-10 h-96 w-[44rem] -rotate-[18deg] opacity-90">
-          <div className="grid grid-cols-6 gap-6">
-            <div className="col-span-2 h-28 rounded-xl border border-white/10 bg-white/5 p-2 shadow-2xl shadow-black/40" />
-            <div className="col-span-2 mt-10 h-24 rounded-xl border border-white/10 bg-white/5 p-2 shadow-2xl shadow-black/40" />
-            <div className="col-span-2 h-32 rounded-xl border border-white/10 bg-white/5 p-2 shadow-2xl shadow-black/40" />
-            <div className="col-span-3 -mt-4 h-28 rounded-xl border border-white/10 bg-white/5 p-2 shadow-2xl shadow-black/40" />
-            <div className="col-span-3 mt-6 h-24 rounded-xl border border-white/10 bg-white/5 p-2 shadow-2xl shadow-black/40" />
-            <div className="col-span-2 mt-6 h-24 rounded-xl border border-white/10 bg-white/5 p-2 shadow-2xl shadow-black/40" />
-            <div className="col-span-4 -mt-10 h-36 rounded-xl border border-white/10 bg-white/5 p-2 shadow-2xl shadow-black/40" />
+      {/* Content container padded so it doesn't sit beneath rails */}
+      <div className="relative z-20 mx-auto container px-4">
+        <div className="pt-16 sm:pt-24 lg:pt-28" />
+
+        {/* HERO */}
+        <div className="relative grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
+          {/* Left: copy + CTAs + stats */}
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-slate-300">
+              <Sparkles className="h-3.5 w-3.5" />
+              New in v1.1
+              <span className="text-cyan-300">160+ blocks</span>
+            </div>
+
+            <h1 className="mt-5 text-4xl sm:text-6xl font-extrabold tracking-tight text-white">
+              Build modern UIs{" "}
+              <span className="bg-gradient-to-r from-indigo-400 via-sky-400 to-emerald-400 bg-clip-text text-transparent">
+                ridiculously fast
+              </span>
+            </h1>
+
+            <p className="mt-4 max-w-xl text-slate-300">
+              Stop reinventing the wheel. Use production-ready sections—Heroes, Pricing, Testimonials,
+              Dashboards—crafted for{" "}
+              <span className="font-semibold text-indigo-300">React</span> +
+              <span className="font-semibold text-indigo-300"> TailwindCSS</span> with clean a11y and dark mode.
+            </p>
+
+            <div className="mt-6 flex flex-col sm:flex-row gap-3">
+              <Link to="/ui-blocks" className="inline-flex">
+                <button className="group inline-flex items-center gap-2 rounded-xl bg-indigo-500 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-indigo-500/20 hover:bg-indigo-400">
+                  Browse Components
+                  <ArrowRight className="h-4 w-4 transition -translate-x-0 group-hover:translate-x-0.5" />
+                </button>
+              </Link>
+
+              <Link to="/template" className="inline-flex">
+                <button className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-slate-200 hover:bg-white/10">
+                  Explore Templates
+                  <Layers className="h-4 w-4" />
+                </button>
+              </Link>
+
+              <Link to="/live-demo" className="inline-flex">
+                <button className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium text-slate-300 ring-1 ring-white/10 hover:ring-white/20">
+                  <PlayCircle className="h-4 w-4" />
+                  Live demo
+                </button>
+              </Link>
+            </div>
+
+            {/* Quick stats */}
+            <div className="mt-6 grid grid-cols-3 gap-3 text-center">
+              {[
+                ["160+", "Sections"],
+                ["28", "Categories"],
+                ["Weekly", "Updates"],
+              ].map(([k, v]) => (
+                <div key={k} className="rounded-xl bg-white/5 p-3 ring-1 ring-white/10 backdrop-blur">
+                  <div className="text-2xl font-extrabold text-white">{k}</div>
+                  <div className="text-slate-400 text-xs">{v}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Feature grid */}
+            <ul className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+              {[
+                [<CheckCircle2 key="a" className="h-4 w-4 text-emerald-400" />, "Accessible", "WCAG-friendly components"],
+                [<ShieldCheck key="b" className="h-4 w-4 text-sky-400" />, "Theme-ready", "Dark/light with tokens"],
+                [<Gauge key="c" className="h-4 w-4 text-indigo-400" />, "Performance-first", "<2kb per section"],
+                [<PlugZap key="d" className="h-4 w-4 text-cyan-300" />, "Composable", "Headless logic & hooks"],
+              ].map(([Icon, title, sub]) => (
+                <li key={String(title)} className="flex items-start gap-3 rounded-xl bg-white/5 p-3 ring-1 ring-white/10">
+                  {Icon as React.ReactNode}
+                  <div>
+                    <p className="font-semibold text-white">{title}</p>
+                    <p className="text-slate-400">{sub}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+
+            {/* Social proof */}
+            <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3 text-xs text-slate-400">
+              <div className="flex -space-x-2">
+                <img alt="" src="https://i.pravatar.cc/28?img=1" className="h-6 w-6 rounded-full ring-2 ring-[var(--bg)] animate-[float_6s_ease-in-out_infinite]" />
+                <img alt="" src="https://i.pravatar.cc/28?img=3" className="h-6 w-6 rounded-full ring-2 ring-[var(--bg)] animate-[float_6s_ease-in-out_infinite] [animation-delay:.2s]" />
+                <img alt="" src="https://i.pravatar.cc/28?img=8" className="h-6 w-6 rounded-full ring-2 ring-[var(--bg)] animate-[float_6s_ease-in-out_infinite] [animation-delay:.4s]" />
+              </div>
+              <span>
+                Trusted by <span className="font-semibold text-white">3,200+</span> developers
+              </span>
+              <a href="https://github.com" className="inline-flex items-center gap-1 hover:opacity-80">
+                <Github className="h-3.5 w-3.5" />
+                1.6k★
+              </a>
+            </div>
           </div>
-          {/* soft fade so collage blends into bg */}
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-l from-[var(--bg)] via-transparent" />
-        </div>
-      </div>
-    </div>
-    <div className="pb-24" />
-  </div>
-</section>
 
+          {/* Right: angled preview stack */}
+          <div className="relative">
+            {/* Back card */}
+            <div className="pointer-events-none absolute -top-6 -left-4 hidden h-[18rem] w-[34rem] -rotate-6 rounded-2xl border border-white/10 bg-white/5 opacity-60 blur-[1px] sm:block" />
+            {/* Middle card */}
+            <div className="pointer-events-none absolute -top-3 -right-8 hidden h-[18rem] w-[34rem] rotate-3 rounded-2xl border border-white/10 bg-white/5 opacity-70 sm:block" />
+            {/* Foreground card */}
+            <div className="relative rounded-2xl border border-white/10 bg-white/5 shadow-2xl backdrop-blur-xl transition-transform tilt will-change-transform">
+              {/* Sheen */}
+              <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl">
+                <span className="absolute left-0 top-0 h-full w-1/3 -skew-x-12 bg-gradient-to-r from-white/5 via-white/10 to-transparent animate-[sheen_3.5s_ease-in-out_infinite]" />
+              </div>
+
+              {/* Header */}
+              <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
+                <div className="flex items-center gap-1">
+                  <span className="h-2.5 w-2.5 rounded-full bg-rose-400/80" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-amber-400/80" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/80" />
+                </div>
+                <div className="flex gap-1 text-[11px]">
+                  <span className="rounded-md bg-white/10 px-2 py-0.5 text-white ring-1 ring-white/10">React</span>
+                  <span className="rounded-md px-2 py-0.5 text-slate-300 ring-1 ring-white/10">Tailwind</span>
+                  <span className="rounded-md px-2 py-0.5 text-slate-300 ring-1 ring-white/10">HTML</span>
+                </div>
+              </div>
+
+              {/* Code sample */}
+              <pre className="px-4 py-4 text-xs leading-relaxed overflow-x-auto text-slate-300">
+                {`import { Button } from "@/components/ui";
+                export default function PricingCTA() {
+                  return (
+                    <div className="rounded-xl p-4 md:p-6 bg-gradient-to-br from-indigo-500/10 to-emerald-500/10 ring-1 ring-white/10">
+                      <h3 className="text-base md:text-lg font-semibold text-white">Start building today</h3>
+                      <p className="mt-1 text-slate-300">Access 160+ sections and growing weekly.</p>
+                      <button className="mt-3 inline-flex items-center gap-2 rounded-lg bg-white/90 px-3 py-2 text-slate-900">
+                        Get Access <span>→</span>
+                      </button>
+                    </div>
+                  )
+                }`}
+              </pre>
+
+              {/* Footer metrics */}
+              <div className="grid grid-cols-3 gap-2 border-t border-white/10 p-3 text-center text-[11px] text-slate-300">
+                <div className="rounded-lg bg-white/5 p-2 ring-1 ring-white/10">
+                  <p className="font-semibold text-white">A+</p>
+                  <p>Lighthouse UI</p>
+                </div>
+                <div className="rounded-lg bg-white/5 p-2 ring-1 ring-white/10">
+                  <p className="font-semibold text-white">&lt;2kb</p>
+                  <p>Per section</p>
+                </div>
+                <div className="rounded-lg bg-white/5 p-2 ring-1 ring-white/10">
+                  <p className="font-semibold text-white">0 setup</p>
+                  <p>Copy & paste</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Logos row */}
+<div className="mt-12 flex flex-wrap items-center justify-center gap-x-10 gap-y-6 opacity-80">
+  {/* Google */}
+  <div className="flex items-center gap-2 text-slate-300 ring-1 ring-white/10 rounded-lg px-4 py-2 bg-white/5 hover:opacity-100 transition">
+    <img
+      src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg"
+      alt="Google"
+      className="h-6 w-6"
+    />
+    <span className="text-sm md:text-base font-medium">Google</span>
+  </div>
+
+{/* Microsoft */}
+<div className="flex items-center gap-2 text-slate-300 ring-1 ring-white/10 rounded-lg px-4 py-2 bg-white/5 hover:opacity-100 transition">
+  <img
+    src="https://www.vectorlogo.zone/logos/microsoft/microsoft-icon.svg"
+    alt="Microsoft"
+    className="h-6 w-6"
+    onError={(e) => {
+      (e.currentTarget as HTMLImageElement).src = "https://cdn.simpleicons.org/microsoft/ffffff";
+    }}
+  />
+  <span className="text-sm md:text-base font-medium">Microsoft</span>
+</div>
+
+{/* AWS */}
+<div className="flex items-center gap-2 text-slate-300 ring-1 ring-white/10 rounded-lg px-4 py-2 bg-white/5 hover:opacity-100 transition">
+  <img
+    src="https://www.vectorlogo.zone/logos/amazon_aws/amazon_aws-icon.svg"
+    alt="AWS"
+    className="h-6 w-6"
+    onError={(e) => {
+      (e.currentTarget as HTMLImageElement).src = "https://cdn.simpleicons.org/amazonaws/FF9900";
+    }}
+  />
+  <span className="text-sm md:text-base font-medium">AWS</span>
+</div>
+
+
+  {/* Meta */}
+  <div className="flex items-center gap-2 text-slate-300 ring-1 ring-white/10 rounded-lg px-4 py-2 bg-white/5 hover:opacity-100 transition">
+    <img
+      src="https://cdn.simpleicons.org/meta/0866FF"
+      alt="Meta"
+      className="h-6 w-6"
+    />
+    <span className="text-sm md:text-base font-medium">Meta</span>
+  </div>
+
+  {/* Vercel */}
+  <div className="flex items-center gap-2 text-slate-300 ring-1 ring-white/10 rounded-lg px-4 py-2 bg-white/5 hover:opacity-100 transition">
+    <img
+      src="https://cdn.simpleicons.org/vercel/ffffff"
+      alt="Vercel"
+      className="h-6 w-6"
+    />
+    <span className="text-sm md:text-base font-medium">Vercel</span>
+  </div>
+
+  {/* Tailwind */}
+  <div className="flex items-center gap-2 text-slate-300 ring-1 ring-white/10 rounded-lg px-4 py-2 bg-white/5 hover:opacity-100 transition">
+    <img
+      src="https://cdn.simpleicons.org/tailwindcss/38BDF8"
+      alt="Tailwind"
+      className="h-6 w-6"
+    />
+    <span className="text-sm md:text-base font-medium">Tailwind</span>
+  </div>
+
+  {/* Figma */}
+  <div className="flex items-center gap-2 text-slate-300 ring-1 ring-white/10 rounded-lg px-4 py-2 bg-white/5 hover:opacity-100 transition">
+    <img
+      src="https://cdn.simpleicons.org/figma/F24E1E"
+      alt="Figma"
+      className="h-6 w-6"
+    />
+    <span className="text-sm md:text-base font-medium">Figma</span>
+  </div>
+
+  {/* React */}
+  <div className="flex items-center gap-2 text-slate-300 ring-1 ring-white/10 rounded-lg px-4 py-2 bg-white/5 hover:opacity-100 transition">
+    <img
+      src="https://cdn.simpleicons.org/react/61DAFB"
+      alt="React"
+      className="h-6 w-6"
+    />
+    <span className="text-sm md:text-base font-medium">React</span>
+  </div>
+
+  {/* TypeScript */}
+  <div className="flex items-center gap-2 text-slate-300 ring-1 ring-white/10 rounded-lg px-4 py-2 bg-white/5 hover:opacity-100 transition">
+    <img
+      src="https://cdn.simpleicons.org/typescript/3178C6"
+      alt="TypeScript"
+      className="h-6 w-6"
+    />
+    <span className="text-sm md:text-base font-medium">TypeScript</span>
+  </div>
+
+  {/* GitHub */}
+  <div className="flex items-center gap-2 text-slate-300 ring-1 ring-white/10 rounded-lg px-4 py-2 bg-white/5 hover:opacity-100 transition">
+    <img
+      src="https://cdn.simpleicons.org/github/ffffff"
+      alt="GitHub"
+      className="h-6 w-6"
+    />
+    <span className="text-sm md:text-base font-medium">GitHub</span>
+  </div>
+
+  {/* Apple */}
+  <div className="flex items-center gap-2 text-slate-300 ring-1 ring-white/10 rounded-lg px-4 py-2 bg-white/5 hover:opacity-100 transition">
+    <img
+      src="https://cdn.simpleicons.org/apple/ffffff"
+      alt="Apple"
+      className="h-6 w-6"
+    />
+    <span className="text-sm md:text-base font-medium">Apple</span>
+  </div>
+</div>
+
+
+
+        <div className="pb-24" />
+      </div>
+    </section>
   );
 }

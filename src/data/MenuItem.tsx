@@ -1,4 +1,4 @@
-import { Box } from "lucide-react";
+import {  Crown, Dices } from "lucide-react";
 import type { MenuItem } from "../Interface/Menu";
 
 const menuData: MenuItem[] = [
@@ -14,12 +14,12 @@ const menuData: MenuItem[] = [
   // },
   {
     title: "Hero Banner",
-    icon: <Box size={20} />,
+    icon: <Crown size={20} />,
     path: "/block/hero-section",
   },
   {
     title: "Feature",
-    icon: <Box size={20} />,
+    icon: <Dices size={20} />,
     path: "/block/feature-section",
   },
   // {

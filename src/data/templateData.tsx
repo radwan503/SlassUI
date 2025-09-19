@@ -14,18 +14,18 @@ const templateData = [
     githubLink: 'https://github.com/radwan503/FrogX' 
   },
   { 
-    title: 'CTA Sections', 
-    subtitle: 'Modern call-to-action sections for boosting conversions', 
-    image: 'https://placehold.co/400x200/dbeafe/1e40af?text=CTA+Section',
-    liveLink: '/sections/cta',
-    githubLink: '/sections/cta' 
+    title: 'EduGlobal', 
+    subtitle: 'EduGlobal is a modern e-learning platform offering courses, expert instructors, and insightful blogs. Empower your education journey with a sleek, responsive design', 
+    image: '../../template/eduglobal.png',
+    liveLink: 'https://radwan503.github.io/EduGlobal/',
+    githubLink: 'https://github.com/radwan503/EduGlobal' 
   },
   { 
-    title: 'Bento Grids', 
-    subtitle: 'Creative grid-based layouts for content display', 
-    image: 'https://placehold.co/400x200/fefce8/713f12?text=Bento+Grid',
-    liveLink: '/sections/bento',
-    githubLink: '/sections/bento' 
+    title: 'WeAssist', 
+    subtitle: 'Reliable 24/7 website maintenance & technical support: updates, uptime monitoring, security hardening, backups, performance tuning, and rapid incident response', 
+    image: '../../template/weAssist.png',
+    liveLink: 'https://radwan503.github.io/weAssist/',
+    githubLink: 'https://github.com/radwan503/weAssist' 
   },
   { 
     title: 'Pricing Sections', 

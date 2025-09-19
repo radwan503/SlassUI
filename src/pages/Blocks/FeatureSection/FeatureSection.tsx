@@ -14,6 +14,9 @@ import FeatureSectionDemo11 from "../../../components/Block/FeatureSection/Featu
 import FeatureSectionDemo12 from "../../../components/Block/FeatureSection/FeatureSection12/Demo";
 import FeatureSectionDemo13 from "../../../components/Block/FeatureSection/FeatureSection13/Demo";
 import FeatureSectionDemo14 from "../../../components/Block/FeatureSection/FeatureSection14/Demo";
+import FeatureSectionDemo15 from "../../../components/Block/FeatureSection/FeatureSection15/Demo";
+import FeatureSectionDemo16 from "../../../components/Block/FeatureSection/FeatureSection16/Demo";
+import FeatureSectionDemo17 from "../../../components/Block/FeatureSection/FeatureSection17/Demo";
 
 const featureSections = [
   { title: "Pure Style", desc: "Minimal and clean typography.", component: <FeatureSectionDemo1 /> },
@@ -30,6 +33,9 @@ const featureSections = [
   { title: "Smart Commerce", desc: "Perfect for product showcasing.", component: <FeatureSectionDemo12 /> },
   { title: "Modern Luxury", desc: "Premium look with subtle effects.", component: <FeatureSectionDemo13 /> },
   { title: "Classic Center", desc: "Timeless, centered layout.", component: <FeatureSectionDemo14 /> },
+  { title: "Workflows", desc: "Build smarter automations with seamless integrations", component: <FeatureSectionDemo15 /> },
+  { title: "Automation", desc: "Supercharge your workflows with AI‑powered automation", component: <FeatureSectionDemo16 /> },
+  { title: "Automation", desc: "Supercharge your workflows with AI‑powered automation", component: <FeatureSectionDemo17 /> },
 ];
 
 
@@ -54,11 +60,25 @@ const FeatureSectionPage = () => {
           {/* Step 2: Render dynamically */}
           {featureSections.map((item, index) => (
             <div key={index} className="mb-16">
-              <h2 className="text-xl font-bold text-textSlate">{item.title}</h2>
-              <p className="text-sm text-gray-500 mb-6">{item.desc}</p>
+              {/* Title with modern counter */}
+              <h2 className="flex items-center gap-3 text-2xl font-semibold text-slate-800 dark:text-slate-100">
+                {/* Counter badge */}
+                <span className="flex h-7 w-7 items-center justify-center rounded-full 
+                                bg-gradient-to-tr from-indigo-500 to-purple-500 text-white 
+                                text-xs font-bold shadow-md">
+                  {index + 1}
+                </span>
+                {item.title}
+              </h2>
+              {/* Content */}
+              <p className="m-2 text-base text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl">
+                {item.desc}
+              </p>
               {item.component}
+             
             </div>
           ))}
+
         </div>
       </section>
     </React.Fragment>

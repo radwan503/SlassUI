@@ -1,62 +1,290 @@
+// components/Navbar.tsx
+"use client";
 
-import { Menu, X } from "lucide-react";
-import { Link } from "react-router";
+import React, { useEffect, useMemo, useState } from "react";
+import { Link, useLocation } from "react-router";
+import {
+  Menu, X, Sun, Moon, Search,
+  Github, Linkedin,
+  RedoDot,
+} from "lucide-react";
 import { useTheme } from "../utils/ThemeContext";
 
+type Props = {
+  toggleSidebar?: () => void;
+  toggleNav?: () => void;
+  navOpen?: boolean;
+};
 
-const Navbar = ({ toggleSidebar, toggleNav, navOpen }:any) => {
+const NAV_LINKS = [
+  { label: "Home", to: "/" },
+  { label: "Docs", to: "/docs" },
+  { label: "Templates", to: "/templates" },
+  { label: "Components", to: "/components" },
+  { label: "Pricing", to: "/pricing" },
+  { label: "Blog", to: "/blog" },
+];
+
+const Navbar: React.FC<Props> = ({ toggleSidebar, toggleNav, navOpen }) => {
   const { toggleTheme } = useTheme();
+  const { pathname } = useLocation();
+  const [dark, setDark] = useState(true);
+  const [scrolled, setScrolled] = useState(false);
+  const [pct, setPct] = useState(0);
+
+  // detect theme (for icon)
+  // useEffect(() => {
+  //   if (typeof document !== "undefined") {
+  //     setDark(document.documentElement.classList.contains("dark"));
+  //   }
+  // }, []);
+
+  // page scroll effects (elevate bar + progress line)
+  useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY;
+      const h = document.documentElement.scrollHeight - window.innerHeight;
+      setScrolled(y > 6);
+      setPct(h > 0 ? Math.min(100, Math.round((y / h) * 100)) : 0);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const progressStyle = useMemo(
+    () => ({ width: `${pct}%` }),
+    [pct]
+  );
+
+  const handleTheme = () => {
+    toggleTheme?.();
+    // best-effort reflect icon quickly
+    setDark((d) => !d);
+  };
 
   return (
-    <header className="bg-primary text-white border-b border-darkBg dark:bg-gray-900 dark:text-white h-16 relative z-40">
-      <div className="flex items-center justify-between h-full px-4">
-        <div className="flex items-center gap-2">
-          <button onClick={toggleSidebar} className="2xl:hidden">
-            <Menu size={24} />
+    <header
+      className={[
+        "sticky top-0 z-50",
+        "backdrop-blur-xl",
+        "border-b border-white/10",
+        "text-white",
+        // Blue-dark glass gradient
+        "bg-[rgba(9,14,28,0.6)]",
+        "before:pointer-events-none before:absolute before:inset-0 before:-z-10",
+        "before:bg-[radial-gradient(1200px_600px_at_10%_-10%,rgba(59,130,246,0.20),transparent_60%),radial-gradient(900px_500px_at_90%_-20%,rgba(14,165,233,0.12),transparent_60%)]",
+        scrolled ? "shadow-[0_8px_30px_rgba(2,6,23,0.35)]" : "shadow-none",
+      ].join(" ")}
+    >
+      {/* top progress line */}
+      <div className="absolute left-0 top-0 h-[2px] w-full bg-white/5">
+        <div
+          className="h-full bg-gradient-to-r from-sky-400 via-indigo-500 to-fuchsia-500"
+          style={progressStyle}
+        />
+      </div>
+
+      <div className="mx-auto flex h-16  items-center justify-between px-3 sm:px-6">
+        {/* left: sidebar trigger + logo */}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={toggleSidebar}
+            className="2xl:hidden inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition"
+            aria-label="Toggle sidebar"
+          >
+            <Menu size={20} />
           </button>
-          <Link to="/">
-            <svg width="153" height="45" viewBox="0 0 153 45" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M52.608 30C51.52 30 50.72 29.952 50.208 29.856C49.696 29.76 49.44 29.648 49.44 29.52L50.4 27.432C50.768 27.496 51.68 27.56 53.136 27.624C54.608 27.672 56.624 27.696 59.184 27.696H59.64C60.328 27.696 60.816 27.576 61.104 27.336C61.392 27.08 61.536 26.656 61.536 26.064V25.584C61.536 25.024 61.416 24.624 61.176 24.384C60.952 24.144 60.44 24.024 59.64 24.024H54.072C52.456 24.024 51.28 23.728 50.544 23.136C49.808 22.528 49.44 21.544 49.44 20.184V19.8C49.44 19.096 49.568 18.448 49.824 17.856C50.096 17.264 50.552 16.792 51.192 16.44C51.832 16.072 52.712 15.888 53.832 15.888H60.36C61.448 15.888 62.328 15.944 63 16.056C63.672 16.168 64.008 16.288 64.008 16.416L63.528 18.432C63.112 18.384 62.168 18.336 60.696 18.288C59.224 18.224 57.248 18.192 54.768 18.192L54.504 18.168C53.768 18.168 53.272 18.32 53.016 18.624C52.76 18.912 52.624 19.28 52.608 19.728V20.136C52.608 20.664 52.752 21.064 53.04 21.336C53.344 21.592 53.84 21.72 54.528 21.72H59.856C60.88 21.72 61.752 21.824 62.472 22.032C63.192 22.24 63.744 22.624 64.128 23.184C64.512 23.728 64.704 24.536 64.704 25.608V25.992C64.704 27.192 64.392 28.16 63.768 28.896C63.16 29.632 62.096 30 60.576 30H52.608ZM68.0606 30V16.704L67.8206 14.784H70.9886V30H68.0606ZM77.2035 30C75.9875 30 75.1075 29.72 74.5635 29.16C74.0195 28.584 73.7475 27.8 73.7475 26.808C73.7475 25.768 74.0275 24.968 74.5875 24.408C75.1635 23.848 76.0355 23.568 77.2035 23.568H78.4275C79.6275 23.568 80.7075 23.6 81.6675 23.664C82.6275 23.728 83.4195 23.792 84.0435 23.856V22.272C84.0435 22.128 84.0275 21.984 83.9955 21.84C83.9635 21.68 83.8675 21.552 83.7075 21.456C83.5475 21.36 83.2755 21.312 82.8915 21.312H81.6915C79.9475 21.312 78.4915 21.344 77.3235 21.408C76.1555 21.456 75.3635 21.504 74.9475 21.552L74.6835 19.728C74.6835 19.504 75.2915 19.368 76.5075 19.32C77.7235 19.272 79.7555 19.248 82.6035 19.248H83.8035C84.6035 19.248 85.2195 19.36 85.6515 19.584C86.0835 19.808 86.3875 20.088 86.5635 20.424C86.7555 20.76 86.8675 21.104 86.8995 21.456C86.9475 21.792 86.9715 22.08 86.9715 22.32V30H85.0035L84.0675 29.52C83.3955 29.632 82.5875 29.744 81.6435 29.856C80.6995 29.952 79.6195 30 78.4035 30H77.2035ZM77.8275 27.936H83.3235C83.6755 27.936 83.8835 27.904 83.9475 27.84C84.0115 27.776 84.0435 27.576 84.0435 27.24V25.392H77.8275C77.3955 25.392 77.0915 25.496 76.9155 25.704C76.7555 25.912 76.6755 26.24 76.6755 26.688C76.6755 27.136 76.7715 27.456 76.9635 27.648C77.1555 27.84 77.4435 27.936 77.8275 27.936ZM92.6923 30C91.6203 30 90.8603 29.944 90.4123 29.832C89.9643 29.72 89.7403 29.608 89.7403 29.496L90.4603 27.696C90.9243 27.744 91.7723 27.8 93.0043 27.864C94.2523 27.912 95.7883 27.936 97.6123 27.936H98.8123C99.2123 27.936 99.4603 27.832 99.5563 27.624C99.6683 27.4 99.7243 27.104 99.7243 26.736C99.7243 26.368 99.6603 26.072 99.5323 25.848C99.4203 25.624 99.1803 25.512 98.8123 25.512H92.9083C91.7883 25.512 90.9803 25.304 90.4843 24.888C89.9883 24.456 89.7403 23.816 89.7403 22.968V22.008C89.7403 21.784 89.7643 21.52 89.8123 21.216C89.8603 20.912 89.9803 20.608 90.1723 20.304C90.3643 20 90.6763 19.752 91.1083 19.56C91.5403 19.352 92.1403 19.248 92.9083 19.248H99.5323C100.492 19.248 101.172 19.304 101.572 19.416C101.972 19.528 102.172 19.64 102.172 19.752L101.932 21.552C101.468 21.504 100.612 21.456 99.3643 21.408C98.1163 21.344 96.5883 21.312 94.7803 21.312H93.5803C93.1803 21.312 92.9243 21.424 92.8123 21.648C92.7163 21.856 92.6683 22.104 92.6683 22.392C92.6683 22.696 92.7163 22.952 92.8123 23.16C92.9243 23.352 93.1803 23.448 93.5803 23.448H99.4843C100.572 23.448 101.372 23.672 101.884 24.12C102.396 24.568 102.652 25.136 102.652 25.824V27.24C102.652 27.528 102.628 27.832 102.58 28.152C102.548 28.472 102.436 28.776 102.244 29.064C102.052 29.336 101.74 29.56 101.308 29.736C100.876 29.912 100.268 30 99.4843 30H92.6923ZM108.237 30C107.165 30 106.405 29.944 105.957 29.832C105.509 29.72 105.285 29.608 105.285 29.496L106.005 27.696C106.469 27.744 107.317 27.8 108.549 27.864C109.797 27.912 111.333 27.936 113.157 27.936H114.357C114.757 27.936 115.005 27.832 115.101 27.624C115.213 27.4 115.269 27.104 115.269 26.736C115.269 26.368 115.205 26.072 115.077 25.848C114.965 25.624 114.725 25.512 114.357 25.512H108.453C107.333 25.512 106.525 25.304 106.029 24.888C105.533 24.456 105.285 23.816 105.285 22.968V22.008C105.285 21.784 105.309 21.52 105.357 21.216C105.405 20.912 105.525 20.608 105.717 20.304C105.909 20 106.221 19.752 106.653 19.56C107.085 19.352 107.685 19.248 108.453 19.248H115.077C116.037 19.248 116.717 19.304 117.117 19.416C117.517 19.528 117.717 19.64 117.717 19.752L117.477 21.552C117.013 21.504 116.157 21.456 114.909 21.408C113.661 21.344 112.133 21.312 110.325 21.312H109.125C108.725 21.312 108.469 21.424 108.357 21.648C108.261 21.856 108.213 22.104 108.213 22.392C108.213 22.696 108.261 22.952 108.357 23.16C108.469 23.352 108.725 23.448 109.125 23.448H115.029C116.117 23.448 116.917 23.672 117.429 24.12C117.941 24.568 118.197 25.136 118.197 25.824V27.24C118.197 27.528 118.173 27.832 118.125 28.152C118.093 28.472 117.981 28.776 117.789 29.064C117.597 29.336 117.285 29.56 116.853 29.736C116.421 29.912 115.813 30 115.029 30H108.237ZM125.102 30.24C123.646 30.24 122.63 29.848 122.054 29.064C121.478 28.28 121.19 27.24 121.19 25.944V15.888H124.358V26.04C124.358 26.792 124.542 27.296 124.91 27.552C125.278 27.808 125.734 27.936 126.278 27.936H131.366C131.878 27.936 132.326 27.808 132.71 27.552C133.094 27.28 133.286 26.776 133.286 26.04V15.888H136.454V25.944C136.454 26.808 136.334 27.56 136.094 28.2C135.854 28.84 135.454 29.344 134.894 29.712C134.334 30.064 133.558 30.24 132.566 30.24H125.102ZM140.165 30V15.888H143.333V30H140.165Z" fill="#EFEFEF"/>
-            <ellipse cx="22.3299" cy="22.5" rx="14.8049" ry="14.5" fill="#EFEFEF"/>
-            <path d="M32.3509 20.9374L28.3533 17.1485C28.1901 16.9948 27.965 16.9046 27.7271 16.8976C27.4892 16.8907 27.2579 16.9676 27.0836 17.1116C26.9965 17.1834 26.9262 17.2699 26.8769 17.3659C26.8276 17.462 26.8002 17.5658 26.7963 17.6713C26.7924 17.7768 26.8121 17.8819 26.8542 17.9807C26.8963 18.0794 26.96 18.1697 27.0417 18.2465L31.0486 22.0276C31.1302 22.1044 31.194 22.1947 31.2361 22.2934C31.2782 22.3921 31.2979 22.4973 31.294 22.6028C31.2901 22.7083 31.2627 22.8121 31.2134 22.9082C31.1641 23.0042 31.0938 23.0907 31.0066 23.1625L26.7292 26.7024C26.5541 26.8469 26.4509 27.0472 26.4422 27.2593C26.4335 27.4714 26.5201 27.6778 26.6829 27.8332C26.8457 27.9886 27.0714 28.0802 27.3103 28.0879C27.5492 28.0956 27.7818 28.0188 27.9569 27.8743L32.2257 24.3261C32.7482 23.8913 33.0548 23.2902 33.0783 22.6548C33.1018 22.0194 32.8402 21.4017 32.3509 20.9374V20.9374Z" fill="#374957"/>
-            <g clipPath="url(#clip0_3_7)">
-            <path d="M24.4361 14.1506L18.5484 31.5469C18.4006 31.9836 18.6671 32.4406 19.1437 32.5677C19.6202 32.6947 20.1264 32.4437 20.2742 32.007L26.1618 14.6107C26.3096 14.174 26.0431 13.717 25.5665 13.5899C25.09 13.4628 24.5839 13.7139 24.4361 14.1506Z" fill="#374957"/>
-            </g>
-            <path d="M13.5501 23.1104C13.4656 23.036 13.3986 22.9476 13.3529 22.8502C13.3071 22.7527 13.2836 22.6482 13.2836 22.5426C13.2836 22.4371 13.3071 22.3325 13.3529 22.2351C13.3986 22.1376 13.4656 22.0492 13.5501 21.9749L17.6855 18.3124C17.7699 18.2381 17.8369 18.1496 17.8827 18.0522C17.9284 17.9547 17.952 17.8502 17.952 17.7446C17.952 17.6391 17.9284 17.5345 17.8827 17.4371C17.8369 17.3396 17.7699 17.2512 17.6855 17.1769C17.5167 17.0279 17.2883 16.9443 17.0503 16.9443C16.8123 16.9443 16.5839 17.0279 16.4151 17.1769L12.2797 20.8473C11.7736 21.2971 11.4892 21.9069 11.4892 22.5426C11.4892 23.1784 11.7736 23.7881 12.2797 24.2379L16.4151 27.9084C16.5829 28.0561 16.8094 28.1394 17.0458 28.1403C17.1644 28.1409 17.2819 28.1207 17.3917 28.0809C17.5014 28.0411 17.6013 27.9825 17.6855 27.9084C17.7699 27.834 17.8369 27.7456 17.8827 27.6482C17.9284 27.5507 17.952 27.4462 17.952 27.3406C17.952 27.2351 17.9284 27.1305 17.8827 27.0331C17.8369 26.9356 17.7699 26.8472 17.6855 26.7729L13.5501 23.1104Z" fill="#374957"/>
-            <defs>
-            <clipPath id="clip0_3_7">
-            <rect width="20.0352" height="21.4323" fill="white" transform="matrix(0.320581 -0.947221 0.966246 0.257621 8.7895 29.807)"/>
-            </clipPath>
-            </defs>
-            </svg>
+
+          <Link to="/" aria-label="Brand home" className="group inline-flex items-center gap-3">
+            <LogoBadge />
+            <span className="hidden sm:inline text-lg font-semibold tracking-tight">
+              SlassUI
+            </span>
           </Link>
         </div>
 
-        <div className="flex items-center gap-4">
-          <button onClick={toggleTheme}>
-            {/* {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />} */}
-          </button>
-          <button onClick={toggleNav} className="md:hidden">
-            {navOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
-
-        <nav className="hidden md:flex gap-4">
-          <Link to="/">Home</Link>
-          <Link to="https://radwananik.netlify.app/">Creator</Link>
-          <Link to="/contact">Contact</Link>
+        {/* center: nav */}
+        <nav className="hidden md:flex items-center gap-1">
+          {NAV_LINKS.map((item) => {
+            const active = pathname === item.to;
+            return (
+              <Link
+                key={item.to}
+                to={item.to}
+                className={[
+                  "relative rounded-xl px-3 py-2 text-sm transition",
+                  "hover:bg-white/10 hover:text-white",
+                  active ? "text-white bg-white/10" : "text-white/80",
+                ].join(" ")}
+              >
+                {item.label}
+                {/* underline accent on hover */}
+                <span className="pointer-events-none absolute inset-x-3 -bottom-[2px] h-[2px] scale-x-0 bg-gradient-to-r from-sky-400 to-indigo-500 opacity-0 transition-all group-hover:opacity-100 group-hover:scale-x-100" />
+              </Link>
+            );
+          })}
         </nav>
+
+        {/* right: actions */}
+        <div className="flex items-center gap-2">
+          {/* Search (cosmetic) */}
+          <button
+            className="hidden sm:inline-flex h-9 items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 text-sm text-white/80 hover:bg-white/10"
+            aria-label="Search"
+          >
+            <Search size={16} />
+            <span className="hidden lg:inline">Search</span>
+          </button>
+
+          {/* socials */}
+          <IconLink href="https://github.com/your-org" label="GitHub">
+            <Github size={18} />
+          </IconLink>
+          <IconLink href="https://www.linkedin.com/in/your-handle" label="LinkedIn">
+            <Linkedin size={18} />
+          </IconLink>
+          <IconLink href="https://www.reddit.com/r/yourSubreddit" label="Reddit">
+            <RedoDot size={18} />
+          </IconLink>
+
+          {/* theme */}
+          <button
+            onClick={handleTheme}
+            aria-label="Toggle theme"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition"
+            title="Toggle theme"
+          >
+            {dark ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
+
+          {/* mobile menu */}
+          <button
+            onClick={toggleNav}
+            className="md:hidden inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition"
+            aria-label="Toggle navigation"
+          >
+            {navOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+
+          {/* CTA */}
+          <Link
+            to="/get-started"
+            className="hidden md:inline-flex items-center rounded-xl bg-gradient-to-r from-sky-500 to-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow hover:brightness-110 transition"
+          >
+            Get Started
+          </Link>
+        </div>
       </div>
 
+      {/* mobile drawer */}
       {navOpen && (
-        <nav className="md:hidden flex flex-col gap-2 px-4 py-4 absolute w-full bg-blue-500 dark:bg-gray-800">
-          <Link to="/">Home</Link>
-          <Link to="/about">About</Link>
-          <Link to="/contact">Contact</Link>
-        </nav>
+        <div className="md:hidden border-t border-white/10 bg-[rgba(9,14,28,0.85)] backdrop-blur-xl">
+          <div className="mx-auto grid max-w-7xl gap-1 p-4">
+            {NAV_LINKS.map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                className="rounded-xl px-3 py-3 text-sm text-white/90 hover:bg-white/10"
+              >
+                {item.label}
+              </Link>
+            ))}
+
+            <div className="mt-2 grid grid-cols-3 gap-2">
+              <a
+                href="https://github.com/your-org"
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/90 hover:bg-white/10"
+              >
+                <Github size={16} /> GitHub
+              </a>
+              <a
+                href="https://www.linkedin.com/in/your-handle"
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/90 hover:bg-white/10"
+              >
+                <Linkedin size={16} /> LinkedIn
+              </a>
+              <a
+                href="https://www.reddit.com/r/yourSubreddit"
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/90 hover:bg-white/10"
+              >
+                <RedoDot size={16} /> Reddit
+              </a>
+            </div>
+
+            <Link
+              to="/get-started"
+              className="mt-3 inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-sky-500 to-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow hover:brightness-110"
+            >
+              Get Started
+            </Link>
+          </div>
+        </div>
       )}
     </header>
   );
 };
+
+/* --- Bits --- */
+
+function IconLink({
+  href,
+  label,
+  children,
+}: { href: string; label: string; children: React.ReactNode }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      aria-label={label}
+      className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-white/90 hover:bg-white/10 transition"
+      title={label}
+    >
+      {children}
+    </a>
+  );
+}
+
+function LogoBadge() {
+  return (
+    <div className="relative h-11 w-11">
+      <span className="absolute inset-0 rounded-2xl bg-[radial-gradient(circle_at_50%_40%,rgba(56,189,248,0.5),transparent_60%)] blur-[10px]" />
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SlassUI icon">
+          <defs>
+            <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%"  stop-color="var(--logo-start, #38BDF8)"/>
+              <stop offset="100%" stop-color="var(--logo-end, #6366F1)"/>
+            </linearGradient>
+            <radialGradient id="s" cx="50%" cy="38%" r="65%">
+              <stop offset="0%"   stop-color="var(--logo-sheen, #7DD3FC)" stop-opacity=".9"/>
+              <stop offset="70%"  stop-color="var(--logo-mid, #6366F1)"   stop-opacity=".35"/>
+              <stop offset="100%" stop-color="transparent"/>
+            </radialGradient>
+          </defs>
+
+          <rect x="0" y="0" width="40" height="40" rx="12" fill="url(#s)"/>
+          <rect x="0.75" y="0.75" width="38.5" height="38.5" rx="11.25" fill="none" stroke="url(#g)" stroke-width="1.5"/>
+          <circle cx="20" cy="20" r="10.5" fill="none" stroke="url(#g)" stroke-width="2" opacity=".95"/>
+          <circle cx="28" cy="15.5" r="3" fill="var(--logo-start, #38BDF8)"/>
+          <circle cx="13.5" cy="25.5" r="2.2" fill="var(--logo-end, #6366F1)" opacity=".9"/>
+          <path d="M13.2,17.8 C14.8,15.0 18.0,13.6 21.2,14.2
+                  C24.0,14.7 25.9,16.6 25.8,18.6
+                  C25.7,21.4 22.7,22.1 20.2,22.7
+                  C17.2,23.4 14.6,24.1 14.5,26.7
+                  C14.4,29.3 17.0,31.0 20.1,31.0
+                  C22.8,31.0 25.1,29.9 26.5,28.1"
+                fill="none" stroke="url(#g)" stroke-width="2.4" stroke-linecap="round"/>
+        </svg>
+
+    </div>
+  );
+}
 
 export default Navbar;

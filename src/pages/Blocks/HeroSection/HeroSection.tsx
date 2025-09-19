@@ -30,6 +30,13 @@ import HeroSectionDemo28 from "../../../components/Block/HeroSection/HeroSection
 import HeroSectionDemo29 from "../../../components/Block/HeroSection/HeroSection29/Demo";
 import HeroSectionDemo30 from "../../../components/Block/HeroSection/HeroSection30/Demo";
 import HeroSectionDemo31 from "../../../components/Block/HeroSection/HeroSection31/Demo";
+import HeroSectionDemo32 from "../../../components/Block/HeroSection/HeroSection32/Demo";
+import HeroSectionDemo33 from "../../../components/Block/HeroSection/HeroSection33/Demo";
+import HeroSectionDemo34 from "../../../components/Block/HeroSection/HeroSection34/Demo";
+import HeroSectionDemo35 from "../../../components/Block/HeroSection/HeroSection35/Demo";
+import HeroSectionDemo36 from "../../../components/Block/HeroSection/HeroSection36/Demo";
+import HeroSectionDemo37 from "../../../components/Block/HeroSection/HeroSection37/Demo";
+import HeroSectionDemo38 from "../../../components/Block/HeroSection/HeroSection38/Demo";
 
 const heroSections = [
   { title: "Minimal Elegance", desc: "Clean, modern design with focus on typography.", component: <HeroSectionDemo1 /> },
@@ -63,6 +70,13 @@ const heroSections = [
   { title: "Festival Vibes", desc: "Playful, colorful hero for events.", component: <HeroSectionDemo29 /> },
   { title: "Award-Winning Look", desc: "Premium, cutting-edge design that stands out.", component: <HeroSectionDemo30 /> },
   { title: "Award-Winning Look", desc: "Premium, cutting-edge design that stands out.", component: <HeroSectionDemo31 /> },
+  { title: "Educational", desc: "Unlock Your Potential with Online Learning", component: <HeroSectionDemo32 /> },
+  { title: "Social Proof", desc: "Communicate with your customers using different messaging app", component: <HeroSectionDemo33 /> },
+  { title: "Content Flows", desc: "Power up your automation with AI tools", component: <HeroSectionDemo34 /> },
+  { title: "Content Flows", desc: "Power up your automation with AI tools", component: <HeroSectionDemo35 /> },
+  { title: "Content Flows", desc: "Power up your automation with AI tools", component: <HeroSectionDemo36 /> },
+  { title: "Content Flows", desc: "Power up your automation with AI tools", component: <HeroSectionDemo37 /> },
+  { title: "Content Flows", desc: "Power up your automation with AI tools", component: <HeroSectionDemo38 /> },
 ];
 
 const HeroSectionPage = () => {
@@ -86,7 +100,7 @@ const HeroSectionPage = () => {
         {/* Hero Section List */}
         {heroSections.map((hero, index) => (
           <div key={index} className="mb-16">
-            <h2 className="text-xl font-bold text-textSlate">{hero.title}</h2>
+            <h2 className="text-xl font-bold text-textSlate">{hero.title} <sup className=" text-[10px] mb-5 bg-gray-400 rounded-full p-1">{index+1}</sup></h2>
             <p className="text-sm text-gray-500 mb-6">{hero.desc}</p>
             {hero.component}
           </div>

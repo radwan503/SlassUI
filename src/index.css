@@ -23,6 +23,11 @@
   --text-slate:rgb(107, 114, 128 ,1);
   --tab: #06132e42;
 
+  --logo-start: #38BDF8; /* sky-400 */
+  --logo-end:   #6366F1; /* indigo-500 */
+  --logo-sheen: #7DD3FC;
+  --logo-mid:   #6366F1;
+
 
   color-scheme: light dark;
   color: var(--text-color);
@@ -33,6 +38,8 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+
 
 body {
   overflow: hidden;

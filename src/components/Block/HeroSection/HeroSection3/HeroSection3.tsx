@@ -53,7 +53,7 @@ const HeroSection3 = () => {
         </a>
 
         <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-6">
-          Reimagine <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Innovation</span> with SnapKit
+          Reimagine <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Innovation</span> with SlassUI
         </h1>
 
         <p className="text-base sm:text-lg md:text-xl text-slate-400 mb-8 max-w-2xl mx-auto">

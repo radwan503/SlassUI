@@ -10,7 +10,7 @@ const HeroSection2 = () => {
           className="inline-flex items-center justify-between p-1 pr-4 mb-7 text-sm font-medium transition-all duration-300 transform bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 rounded-full"
         >
           <span className="text-xs bg-indigo-600 rounded-full text-white px-4 py-1.5 mr-3 shadow-md">New</span>
-          <span className="text-sm font-medium">SnapKit is out! See what's new</span>
+          <span className="text-sm font-medium">SlassUI is out! See what's new</span>
           <ArrowRight className="ml-2 w-4 h-4" />
         </a>
 
@@ -19,7 +19,7 @@ const HeroSection2 = () => {
           We build with the world’s potential
         </h1>
         <p className="mb-8 text-base sm:text-lg lg:text-xl font-normal text-slate-400 max-w-3xl mx-auto">
-          Here at SnapKit we focus on markets where technology, innovation, and capital can unlock long-term value and drive economic growth.
+          Here at SlassUI we focus on markets where technology, innovation, and capital can unlock long-term value and drive economic growth.
         </p>
 
         {/* Action buttons */}
