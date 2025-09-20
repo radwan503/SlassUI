@@ -4,11 +4,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router";
 import {
-  Menu, X, Sun, Moon, Search,
+  Menu, X, Search,
   Github, Linkedin,
   RedoDot,
 } from "lucide-react";
-import { useTheme } from "../utils/ThemeContext";
+// import { useTheme } from "../utils/ThemeContext";
 
 type Props = {
   toggleSidebar?: () => void;
@@ -26,9 +26,9 @@ const NAV_LINKS = [
 ];
 
 const Navbar: React.FC<Props> = ({ toggleSidebar, toggleNav, navOpen }) => {
-  const { toggleTheme } = useTheme();
+  // const { toggleTheme } = useTheme();
   const { pathname } = useLocation();
-  const [dark, setDark] = useState(true);
+  // const [dark, setDark] = useState(true);
   const [scrolled, setScrolled] = useState(false);
   const [pct, setPct] = useState(0);
 
@@ -57,11 +57,11 @@ const Navbar: React.FC<Props> = ({ toggleSidebar, toggleNav, navOpen }) => {
     [pct]
   );
 
-  const handleTheme = () => {
-    toggleTheme?.();
-    // best-effort reflect icon quickly
-    setDark((d) => !d);
-  };
+  // const handleTheme = () => {
+  //   toggleTheme?.();
+  //   // best-effort reflect icon quickly
+  //   setDark((d) => !d);
+  // };
 
   return (
     <header
@@ -71,9 +71,9 @@ const Navbar: React.FC<Props> = ({ toggleSidebar, toggleNav, navOpen }) => {
         "border-b border-white/10",
         "text-white",
         // Blue-dark glass gradient
-        "bg-[rgba(9,14,28,0.6)]",
+        "bg-[rgba(0,30,107,0.6)]",
         "before:pointer-events-none before:absolute before:inset-0 before:-z-10",
-        "before:bg-[radial-gradient(1200px_600px_at_10%_-10%,rgba(59,130,246,0.20),transparent_60%),radial-gradient(900px_500px_at_90%_-20%,rgba(14,165,233,0.12),transparent_60%)]",
+        //"before:bg-[radial-gradient(1200px_600px_at_10%_-10%,rgba(59,130,246,0.20),transparent_60%),radial-gradient(900px_500px_at_90%_-20%,rgba(14,165,233,0.12),transparent_60%)]",
         scrolled ? "shadow-[0_8px_30px_rgba(2,6,23,0.35)]" : "shadow-none",
       ].join(" ")}
     >
@@ -149,14 +149,14 @@ const Navbar: React.FC<Props> = ({ toggleSidebar, toggleNav, navOpen }) => {
           </IconLink>
 
           {/* theme */}
-          <button
+          {/* <button
             onClick={handleTheme}
             aria-label="Toggle theme"
             className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition"
             title="Toggle theme"
           >
             {dark ? <Sun size={18} /> : <Moon size={18} />}
-          </button>
+          </button> */}
 
           {/* mobile menu */}
           <button

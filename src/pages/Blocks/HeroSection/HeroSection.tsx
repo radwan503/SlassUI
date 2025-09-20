@@ -73,10 +73,10 @@ const heroSections = [
   { title: "Educational", desc: "Unlock Your Potential with Online Learning", component: <HeroSectionDemo32 /> },
   { title: "Social Proof", desc: "Communicate with your customers using different messaging app", component: <HeroSectionDemo33 /> },
   { title: "Content Flows", desc: "Power up your automation with AI tools", component: <HeroSectionDemo34 /> },
-  { title: "Content Flows", desc: "Power up your automation with AI tools", component: <HeroSectionDemo35 /> },
-  { title: "Content Flows", desc: "Power up your automation with AI tools", component: <HeroSectionDemo36 /> },
-  { title: "Content Flows", desc: "Power up your automation with AI tools", component: <HeroSectionDemo37 /> },
-  { title: "Content Flows", desc: "Power up your automation with AI tools", component: <HeroSectionDemo38 /> },
+  { title: "Dark Mind ", desc: "Ship modern UIs in minutes, not days.", component: <HeroSectionDemo35 /> },
+  { title: "Fusions", desc: "Blend of textures and layered visuals", component: <HeroSectionDemo36 /> },
+  { title: "Ignite", desc: "Attention-grabbing, high-energy sections.", component: <HeroSectionDemo37 /> },
+  { title: "Elevate", desc: "Raise product highlights with bold visuals", component: <HeroSectionDemo38 /> },
 ];
 
 const HeroSectionPage = () => {
@@ -98,12 +98,25 @@ const HeroSectionPage = () => {
         </div>
 
         {/* Hero Section List */}
-        {heroSections.map((hero, index) => (
-          <div key={index} className="mb-16">
-            <h2 className="text-xl font-bold text-textSlate">{hero.title} <sup className=" text-[10px] mb-5 bg-gray-400 rounded-full p-1">{index+1}</sup></h2>
-            <p className="text-sm text-gray-500 mb-6">{hero.desc}</p>
-            {hero.component}
-          </div>
+        {heroSections.map((item, index) => (
+            <div key={index} className="mb-16">
+              {/* Title with modern counter */}
+              <h2 className="flex items-center gap-3 text-2xl font-semibold text-slate-100 dark:text-slate-100">
+                {/* Counter badge */}
+                <span className="flex h-7 w-7 items-center justify-center rounded-full 
+                                bg-gradient-to-tr from-indigo-500 to-purple-500 text-white 
+                                text-[10px] font-bold shadow-md">
+                  {index + 1}
+                </span>
+                {item.title}
+              </h2>
+              {/* Content */}
+              <p className="m-2 text-sm text-slate-300 dark:text-slate-400 leading-relaxed max-w-2xl">
+                {item.desc}
+              </p>
+              {item.component}
+             
+            </div>
         ))}
       </div>
     </section>

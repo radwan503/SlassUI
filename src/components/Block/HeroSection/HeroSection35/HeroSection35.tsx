@@ -59,7 +59,7 @@ const HeroSection35 = () => {
       <div className="pointer-events-none absolute -top-24 -left-24 h-96 w-96 rounded-full bg-cyan-400/10 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-24 -right-24 h-[28rem] w-[28rem] rounded-full bg-indigo-400/10 blur-[100px]" />
 
-      <div className="container mx-auto px-4 relative z-10">
+      <div className="container mx-auto max-w-7xl px-4 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           {/* LEFT: Heading + copy + CTAs + stats */}
           <div>

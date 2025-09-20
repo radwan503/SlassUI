@@ -11,7 +11,16 @@ import bash from "react-syntax-highlighter/dist/esm/languages/hljs/bash";
 import xml from "react-syntax-highlighter/dist/esm/languages/hljs/xml";
 import css from "react-syntax-highlighter/dist/esm/languages/hljs/css";
 import { atomOneDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
-import { ArrowUpRight, Check, Circle, Copy, Download } from "lucide-react";
+import {
+  ArrowUpRight,
+  Check,
+  Circle,
+  Copy,
+  Download,
+  Clipboard,
+  PackagePlus,
+  Terminal,
+} from "lucide-react";
 
 // Register languages once
 SyntaxHighlighter.registerLanguage("javascript", js);
@@ -23,6 +32,7 @@ SyntaxHighlighter.registerLanguage("css", css);
 
 type TabKey = "preview" | "code";
 type LayoutMode = "stacked" | "split";
+type Pm = "npm" | "yarn" | "pnpm" | "bun";
 
 type Props = {
   code: string;
@@ -61,6 +71,46 @@ const accentToGrad: Record<NonNullable<Props["accent"]>, string> = {
   fuchsia: "from-fuchsia-500 via-violet-500 to-emerald-400",
 };
 
+const INSTALL_CMDS: Record<Pm, { app: string; dev: string; note: string[] }> = {
+  npm: {
+    app: "npm i react react-dom next lucide-react framer-motion",
+    dev: "npm i -D tailwindcss postcss autoprefixer && npx tailwindcss init -p",
+    note: [
+      "Create ./styles/globals.css with Tailwind layers:",
+      '@tailwind base;',
+      '@tailwind components;',
+      '@tailwind utilities;',
+      "",
+      "Add the Tailwind content globs in tailwind.config.js:",
+      'content: ["./app/**/*.{js,ts,jsx,tsx,mdx}","./components/**/*.{js,ts,jsx,tsx,mdx}"],',
+    ],
+  },
+  yarn: {
+    app: "yarn add react react-dom next lucide-react framer-motion",
+    dev: "yarn add -D tailwindcss postcss autoprefixer && npx tailwindcss init -p",
+    note: [
+      "Create ./styles/globals.css with Tailwind layers (same as npm).",
+      "Set Tailwind content globs in tailwind.config.js (same as npm).",
+    ],
+  },
+  pnpm: {
+    app: "pnpm add react react-dom next lucide-react framer-motion",
+    dev: "pnpm add -D tailwindcss postcss autoprefixer && npx tailwindcss init -p",
+    note: [
+      "Add Tailwind layers in ./styles/globals.css.",
+      "Set Tailwind content globs in tailwind.config.js.",
+    ],
+  },
+  bun: {
+    app: "bun add react react-dom next lucide-react framer-motion",
+    dev: "bun add -d tailwindcss postcss autoprefixer && npx tailwindcss init -p",
+    note: [
+      "Add Tailwind layers in ./styles/globals.css.",
+      "Set Tailwind content globs in tailwind.config.js.",
+    ],
+  },
+};
+
 export default function BlockPreview({
   code,
   children,
@@ -79,6 +129,11 @@ export default function BlockPreview({
   const [fontSize, setFontSize] = useState(0.9); // rem
   const [codeHeight, setCodeHeight] = useState(620); // stacked mode height
   const dragRef = useRef<HTMLDivElement | null>(null);
+
+  // NEW: install note state
+  const [showInstall, setShowInstall] = useState(false);
+  const [pm, setPm] = useState<Pm>("npm");
+  const [copiedInstall, setCopiedInstall] = useState<null | "app" | "dev">(null);
 
   // Clean code & derived
   const cleanCode = useMemo(
@@ -99,6 +154,19 @@ export default function BlockPreview({
       await navigator.clipboard.writeText(cleanCode);
       setCopied(true);
       setTimeout(() => setCopied(false), 1100);
+    } catch {}
+  };
+
+  // NEW: copy install command
+  const handleCopyInstall = async (kind: "app" | "dev") => {
+    try {
+      const text =
+        kind === "app"
+          ? INSTALL_CMDS[pm].app
+          : INSTALL_CMDS[pm].dev;
+      await navigator.clipboard.writeText(text);
+      setCopiedInstall(kind);
+      setTimeout(() => setCopiedInstall(null), 1100);
     } catch {}
   };
 
@@ -178,15 +246,11 @@ export default function BlockPreview({
     };
   }, [layout, codeHeight]);
 
-
   const grad = accentToGrad[accent];
   console.log(grad)
 
   return (
-    <motion.div
-      
-      className="relative [perspective:1200px]"
-    >
+    <motion.div className="relative [perspective:1200px]">
       {/* Outer halo with conic ring */}
       <div className="relative rounded-2xl p-[1.5px]">
         <div className={`absolute -inset-[1.5px] rounded-2xl bg-gradient-to-br opacity-80 blur`} />
@@ -230,19 +294,9 @@ export default function BlockPreview({
                   </button>
                 ))}
               </div>
-
-              {/* Layout toggle */}
-              {/* <button
-                onClick={() => setLayout((l) => (l === "stacked" ? "split" : "stacked"))}
-                className="ml-2 inline-flex items-center gap-1 rounded-full text-center px-3 py-1.5 text-xs font-medium bg-white/10 text-white hover:bg-white/15 border border-white/10 transition"
-                title="Toggle layout (⌘/Ctrl + B)"
-              >
-                <span className="i-lucide-panel-right h-4 w-4" />
-                {layout === "split" ? "Split" : "Stacked"}
-              </button> */}
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 overflow-x-auto md:overflow-auto">
               {/* Language / filename */}
               <span className="hidden md:inline-flex items-center gap-2 text-[11px] sm:text-xs text-white/80 px-2.5 py-1 rounded-md bg-white/10 border border-white/10">
                 <span className="inline-flex h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.7)]" />
@@ -273,7 +327,7 @@ export default function BlockPreview({
                 >
                   {numbers ? "Lines: On" : "Lines: Off"}
                 </button>
-                <div className="flex items-center gap-1 px-1.5 py-1.5 text-xs rounded-md bg-white/10 border border-white/10">
+                <div className="flex items-center gap-1 px-1.5 py-1.5 text-xs text-white rounded-md bg-white/10 border border-white/10">
                   <button
                     onClick={() => setFontSize((s) => Math.max(0.75, +(s - 0.05).toFixed(2)))}
                     className="px-2 rounded hover:bg-white/10"
@@ -281,7 +335,9 @@ export default function BlockPreview({
                   >
                     A–
                   </button>
-                  <span className="opacity-80 min-w-8 text-center">{Math.round(fontSize * 100)}%</span>
+                  <span className="opacity-80 min-w-8 text-center">
+                    {Math.round(fontSize * 100)}%
+                  </span>
                   <button
                     onClick={() => setFontSize((s) => Math.min(1.25, +(s + 0.05).toFixed(2)))}
                     className="px-2 rounded hover:bg-white/10"
@@ -292,6 +348,16 @@ export default function BlockPreview({
                 </div>
               </div>
 
+              {/* NEW: Suggest Install button */}
+              <button
+                onClick={() => setShowInstall((v) => !v)}
+                className="inline-flex items-center gap-1 rounded-md px-3 py-1.5 text-xs font-medium bg-white/10 text-white hover:bg-white/15 border border-white/10 transition"
+                title="Suggested packages for React/Next/Tailwind/Lucide/Framer Motion"
+              >
+                <PackagePlus size={13} />
+                Suggest Install
+              </button>
+
               {/* Actions */}
               <button
                 onClick={handleCopy}
@@ -300,11 +366,11 @@ export default function BlockPreview({
               >
                 {copied ? (
                   <div className="flex gap-2 items-center">
-                     <Check size={12}/> Copied
+                    <Check size={12} /> Copied
                   </div>
                 ) : (
                   <div className="flex gap-2 items-center">
-                     <Copy size={12}/> Copy
+                    <Copy size={12} /> Copy
                   </div>
                 )}
               </button>
@@ -313,8 +379,7 @@ export default function BlockPreview({
                 className="inline-flex items-center gap-1 rounded-md px-3 py-1.5 text-xs font-medium bg-white/10 text-white hover:bg-white/15 border border-white/10 transition"
                 title="Open code in new tab"
               >
-             
-                <ArrowUpRight size={13}/>  Open
+                <ArrowUpRight size={13} /> Open
               </button>
               <button
                 onClick={handleDownload}
@@ -323,11 +388,11 @@ export default function BlockPreview({
               >
                 {downloading ? (
                   <div className="flex gap-2 items-center">
-                   <Circle className="animate-spin"/> Saving…
+                    <Circle className="animate-spin" /> Saving…
                   </div>
                 ) : (
                   <div className="flex gap-2 items-center">
-                    <Download size={12}/>
+                    <Download size={12} />
                     Download
                   </div>
                 )}
@@ -335,18 +400,103 @@ export default function BlockPreview({
             </div>
           </div>
 
+          {/* NEW: Install Note Panel */}
+          {showInstall && (
+            <div className={`border-b border-white/10`}>
+              <div
+                className={`px-4 py-4 bg-gradient-to-r ${accentToGrad.indigo} text-white`}
+              >
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <Terminal size={16} />
+                    <h3 className="text-sm sm:text-base font-semibold">
+                      Suggested installation for React + Next + TailwindCSS + lucide-react + Framer Motion
+                    </h3>
+                  </div>
+
+                  {/* PM tabs */}
+                  <div className="flex items-center gap-1 bg-white/15 rounded-full p-1">
+                    {(["npm", "yarn", "pnpm", "bun"] as Pm[]).map((k) => (
+                      <button
+                        key={k}
+                        onClick={() => setPm(k)}
+                        className={[
+                          "px-3 py-1.5 text-xs rounded-full transition",
+                          pm === k ? "bg-white text-slate-900" : "text-white/90 hover:text-white",
+                        ].join(" ")}
+                      >
+                        {k}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Commands */}
+                <div className="mt-3 grid md:grid-cols-2 gap-3">
+                  {/* App deps */}
+                  <div className="rounded-lg bg-black/25 border border-white/20">
+                    <div className="flex items-center justify-between px-3 py-2 border-b border-white/20">
+                      <span className="text-xs font-medium opacity-90">App packages</span>
+                      <button
+                        onClick={() => handleCopyInstall("app")}
+                        className="inline-flex items-center gap-1 text-xs bg-white/20 hover:bg-white/30 px-2 py-1 rounded-md transition"
+                        title="Copy"
+                      >
+                        {copiedInstall === "app" ? <Check size={12} /> : <Clipboard size={12} />}
+                        Copy
+                      </button>
+                    </div>
+                    <pre className="px-3 py-2 text-[11.5px] whitespace-pre-wrap break-words">
+{INSTALL_CMDS[pm].app}
+                    </pre>
+                  </div>
+
+                  {/* Dev deps + init */}
+                  <div className="rounded-lg bg-black/25 border border-white/20">
+                    <div className="flex items-center justify-between px-3 py-2 border-b border-white/20">
+                      <span className="text-xs font-medium opacity-90">Tailwind dev setup</span>
+                      <button
+                        onClick={() => handleCopyInstall("dev")}
+                        className="inline-flex items-center gap-1 text-xs bg-white/20 hover:bg-white/30 px-2 py-1 rounded-md transition"
+                        title="Copy"
+                      >
+                        {copiedInstall === "dev" ? <Check size={12} /> : <Clipboard size={12} />}
+                        Copy
+                      </button>
+                    </div>
+                    <pre className="px-3 py-2 text-[11.5px] whitespace-pre-wrap break-words">
+{INSTALL_CMDS[pm].dev}
+                    </pre>
+                  </div>
+                </div>
+
+                {/* Notes */}
+                <div className="mt-3 rounded-lg bg-black/20 border border-white/20 px-3 py-2">
+                  <p className="text-[11.5px] opacity-90">
+                    Notes
+                  </p>
+                  <ul className="mt-1 text-[11.5px] opacity-95 list-disc pl-5 space-y-0.5">
+                    {INSTALL_CMDS[pm].note.map((n, i) => (
+                      <li key={i}>{n}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Body */}
           <div
             className={[
               "relative z-10",
               layout === "split"
                 ? "grid md:grid-cols-2 gap-4 p-3 sm:p-4"
-                : "p-3 sm:p-4",
+                : "p-0 md:p-4",
             ].join(" ")}
           >
             {/* Preview */}
             {(layout === "split" || activeTab === "preview") && (
-              <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+              <div className=" bg-white/5 p-0 ">
                 {children}
               </div>
             )}

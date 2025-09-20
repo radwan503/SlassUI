@@ -35,7 +35,7 @@ const featureSections = [
   { title: "Classic Center", desc: "Timeless, centered layout.", component: <FeatureSectionDemo14 /> },
   { title: "Workflows", desc: "Build smarter automations with seamless integrations", component: <FeatureSectionDemo15 /> },
   { title: "Automation", desc: "Supercharge your workflows with AI‑powered automation", component: <FeatureSectionDemo16 /> },
-  { title: "Automation", desc: "Supercharge your workflows with AI‑powered automation", component: <FeatureSectionDemo17 /> },
+  { title: "Focus Frame", desc: "Highlight content with bold framing.", component: <FeatureSectionDemo17 /> },
 ];
 
 
@@ -61,17 +61,17 @@ const FeatureSectionPage = () => {
           {featureSections.map((item, index) => (
             <div key={index} className="mb-16">
               {/* Title with modern counter */}
-              <h2 className="flex items-center gap-3 text-2xl font-semibold text-slate-800 dark:text-slate-100">
+              <h2 className="flex items-center gap-3 text-2xl font-semibold text-slate-100 dark:text-slate-100">
                 {/* Counter badge */}
                 <span className="flex h-7 w-7 items-center justify-center rounded-full 
                                 bg-gradient-to-tr from-indigo-500 to-purple-500 text-white 
-                                text-xs font-bold shadow-md">
+                                text-[10px] font-bold shadow-md">
                   {index + 1}
                 </span>
                 {item.title}
               </h2>
               {/* Content */}
-              <p className="m-2 text-base text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl">
+              <p className="m-2 text-base text-slate-300 dark:text-slate-400 leading-relaxed max-w-2xl">
                 {item.desc}
               </p>
               {item.component}

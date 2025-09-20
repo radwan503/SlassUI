@@ -1,7 +1,9 @@
+// app/sections/FeatureSectionNeo.tsx
 "use client";
 
 import {
   ArrowRight,
+  ArrowUpRight,
   Bot,
   BarChart3,
   MessageSquare,
@@ -13,9 +15,19 @@ import {
   Link2,
   CheckCircle2,
   Globe,
+  Users,
+  Star,
+  Zap,
 } from "lucide-react";
-import { motion, type Variants } from "framer-motion";
-import React, { useMemo, useRef, useState, useEffect, useCallback } from "react";
+import { motion, type Variants, useReducedMotion } from "framer-motion";
+import React, {
+  useMemo,
+  useRef,
+  useState,
+  useEffect,
+  useCallback,
+  useLayoutEffect,
+} from "react";
 
 /** ---------------------------------------
  *  TimelineContent (local shim)
@@ -61,17 +73,16 @@ function TimelineContent({
  *  Animation Variants
  * -------------------------------------- */
 const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 22, filter: "blur(6px)" },
+  hidden: { opacity: 0, y: 22 },
   visible: (i: number = 0) => ({
     opacity: 1,
     y: 0,
-    filter: "blur(0px)",
     transition: { delay: 0.06 * i, duration: 0.5, ease: "easeOut" },
   }),
 };
 
 const tiltIn: Variants = {
-  hidden: { opacity: 0, rotateX: 20, y: 14 },
+  hidden: { opacity: 0, rotateX: 12, y: 14 },
   visible: (i: number = 0) => ({
     opacity: 1,
     rotateX: 0,
@@ -86,16 +97,143 @@ const floatY: Variants = {
 };
 
 /** ---------------------------------------
- *  Small UI Bits
+ *  Small UI Bits (solid surfaces)
  * -------------------------------------- */
 function Badge({ icon: Icon, text }: { icon: any; text: string }) {
   return (
-    <div className="inline-flex items-center gap-2 rounded-full border border-neutral-200/70 bg-white/70 px-3 py-1 text-xs shadow-sm backdrop-blur-sm dark:border-neutral-800 dark:bg-neutral-900/60">
-      <Icon className="h-3.5 w-3.5" />
-      <span className="font-medium">{text}</span>
+    <div className="inline-flex items-center gap-2 rounded-full bg-neutral-100 px-3 py-1 text-xs shadow dark:bg-neutral-800">
+      <Icon className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400" />
+      <span className="font-medium text-neutral-800 dark:text-neutral-200">{text}</span>
     </div>
   );
 }
+
+// --- Visual helpers (drop above export default) -----------------------------
+
+function toPath(data: number[], w: number, h: number, p: number) {
+  const max = Math.max(...data);
+  const min = Math.min(...data);
+  const span = Math.max(1, max - min);
+  const xStep = (w - p * 2) / Math.max(1, data.length - 1);
+  const y = (v: number) => h - p - ((v - min) / span) * (h - p * 2);
+
+  const pts = data.map((v, i) => `${p + i * xStep},${y(v)}`);
+  const line = `M ${pts[0]} L ${pts.slice(1).join(" ")}`;
+  const area = `${line} L ${w - p},${h - p} L ${p},${h - p} Z`;
+  return { line, area };
+}
+
+function SparkLine({ data }: { data: number[] }) {
+  const w = 140, h = 36, p = 6;
+  const { line } = toPath(data, w, h, p);
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} className="w-full">
+      <defs>
+        <linearGradient id="sparkGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#4f46e5" />
+          <stop offset="100%" stopColor="#10b981" />
+        </linearGradient>
+      </defs>
+      <path d={line} fill="none" stroke="url(#sparkGrad)" strokeWidth="2" />
+    </svg>
+  );
+}
+
+function AreaChart({ data }: { data: number[] }) {
+  const w = 520, h = 160, p = 10;
+  const { line, area } = toPath(data, w, h, p);
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} className="w-full">
+      <defs>
+        <linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#4f46e5" stopOpacity="0.35" />
+          <stop offset="100%" stopColor="#4f46e5" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <g opacity={0.9}>
+        <path d={area} fill="url(#areaFill)" />
+        <path d={line} fill="none" stroke="#4f46e5" strokeWidth="2" />
+      </g>
+      {/* x-axis baseline */}
+      <line x1={p} y1={h - p} x2={w - p} y2={h - p} className="stroke-neutral-200 dark:stroke-neutral-800" />
+    </svg>
+  );
+}
+
+function DonutChart({
+  segments = [
+    { label: "North America", value: 38, color: "#4f46e5" },
+    { label: "EMEA", value: 32, color: "#10b981" },
+    { label: "APAC", value: 30, color: "#f59e0b" },
+  ],
+}: {
+  segments?: { label: string; value: number; color: string }[];
+}) {
+  const size = 160;
+  const r = 48;
+  const c = 2 * Math.PI * r;
+  const total = segments.reduce((s, x) => s + x.value, 0);
+  let offset = 0;
+
+  return (
+    <div className="flex items-center gap-4">
+      <svg viewBox={`0 0 ${size} ${size}`} className="h-32 w-32 -rotate-90">
+        <circle cx={size/2} cy={size/2} r={r} stroke="currentColor" className="text-neutral-200 dark:text-neutral-800" strokeWidth="10" fill="none" />
+        {segments.map((s) => {
+          const frac = s.value / total;
+          const dash = frac * c;
+          const el = (
+            <circle
+              key={s.label}
+              cx={size/2}
+              cy={size/2}
+              r={r}
+              stroke={s.color}
+              strokeWidth="10"
+              fill="none"
+              strokeDasharray={`${dash} ${c - dash}`}
+              strokeDashoffset={-offset}
+            />
+          );
+          offset += dash;
+          return el;
+        })}
+        {/* center dot */}
+        <circle cx={size/2} cy={size/2} r={r - 18} fill="white" className="dark:fill-neutral-900" />
+        <text x="50%" y="50%" transform="rotate(90,80,80)" textAnchor="middle" dominantBaseline="central" className="fill-neutral-800 dark:fill-neutral-100 text-sm">
+          {total}k
+        </text>
+      </svg>
+      <div className="space-y-2 text-sm">
+        {segments.map((s) => (
+          <div key={s.label} className="flex items-center gap-2">
+            <span className="h-2.5 w-2.5 rounded-full" style={{ background: s.color }} />
+            <span className="text-neutral-700 dark:text-neutral-300">{s.label}</span>
+            <span className="ml-auto font-medium text-neutral-900 dark:text-neutral-100">{s.value}%</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function KpiCard({
+  label, value, hint, data,
+}: {
+  label: string; value: string; hint: string; data: number[];
+}) {
+  return (
+    <div className="rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900">
+      <div className="text-xs text-neutral-500 dark:text-neutral-400">{label}</div>
+      <div className="mt-1 text-2xl font-semibold text-neutral-900 dark:text-white">{value}</div>
+      <div className="text-xs text-emerald-600 dark:text-emerald-400">{hint}</div>
+      <div className="mt-2">
+        <SparkLine data={data} />
+      </div>
+    </div>
+  );
+}
+
 
 function Metric({
   label,
@@ -113,9 +251,9 @@ function Metric({
       ? "text-emerald-600 dark:text-emerald-400"
       : "text-amber-600 dark:text-amber-400";
   return (
-    <div className="rounded-xl border border-neutral-200 bg-white/60 p-4 shadow-sm backdrop-blur-sm dark:border-neutral-800 dark:bg-neutral-900/50">
-      <div className="text-3xl font-semibold tracking-tight">{value}</div>
-      <div className="text-[13px] text-neutral-500">{label}</div>
+    <div className="rounded-xl border border-neutral-200 bg-white p-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+      <div className="text-3xl font-semibold tracking-tight text-neutral-900 dark:text-white">{value}</div>
+      <div className="text-[13px] text-neutral-500 dark:text-neutral-400">{label}</div>
       {hint ? <div className={`mt-2 text-xs ${trendColor}`}>{hint}</div> : null}
     </div>
   );
@@ -161,7 +299,7 @@ function MiniBars() {
           animate={{ y: 80 - b.h, height: b.h }}
           transition={{ delay: 0.2 + b.d, type: "spring", stiffness: 120, damping: 18 }}
           fill="url(#g1)"
-          opacity="0.9"
+          opacity="0.95"
         />
       ))}
     </svg>
@@ -169,9 +307,9 @@ function MiniBars() {
 }
 
 /** ---------------------------------------
- *  Tabs Spec
+ *  Tabs Spec (solid) + extras for content
  * -------------------------------------- */
-const TABS:any = [
+const TABS: any = [
   {
     key: "ai",
     label: "AI Insights",
@@ -185,6 +323,8 @@ const TABS:any = [
       { label: "Export as report", icon: Download },
     ],
     integrations: ["Stripe", "Postgres", "Segment", "Shopify"],
+    useCases: ["Reduce churn", "Spot anomalies", "Explain KPIs"],
+    sublabel: "Insights • ML • Explainability",
   },
   {
     key: "reporting",
@@ -199,6 +339,8 @@ const TABS:any = [
       { label: "Get a share link", icon: Link2 },
     ],
     integrations: ["Slack", "Notion", "Google Drive"],
+    useCases: ["Board updates", "Weekly KPIs", "Client reports"],
+    sublabel: "Dashboards • Snapshots • Sharing",
   },
   {
     key: "chat",
@@ -213,6 +355,8 @@ const TABS:any = [
       { label: "View transcript", icon: Download },
     ],
     integrations: ["Zendesk", "Linear", "Intercom"],
+    useCases: ["CSAT boost", "Triage faster", "Close loops"],
+    sublabel: "Support • Collaboration",
   },
   {
     key: "stack",
@@ -227,13 +371,15 @@ const TABS:any = [
       { label: "See policy diff", icon: CheckCircle2 },
     ],
     integrations: ["Auth", "Webhook", "Billing", "S3"],
+    useCases: ["Launch faster", "Scale safely", "Bill usage"],
+    sublabel: "Auth • Billing • Limits",
   },
 ] as const;
 
 type TabKey = (typeof TABS)[number]["key"];
 
 /** ---------------------------------------
- *  Tab Card
+ *  TabCard (unchanged visuals)
  * -------------------------------------- */
 function TabCard({
   active,
@@ -259,27 +405,26 @@ function TabCard({
       className={[
         "group relative overflow-hidden rounded-2xl border p-5 transition-all",
         active
-          ? "border-indigo-300/50 bg-gradient-to-b from-white to-indigo-50 shadow-[0_10px_35px_-15px_rgba(99,102,241,0.35)] dark:from-neutral-900 dark:to-neutral-900/60 dark:border-indigo-600/30"
+          ? "border-indigo-300 bg-white shadow-[0_12px_40px_-18px_rgba(79,70,229,0.35)] dark:border-indigo-700/60 dark:bg-neutral-900"
           : "border-neutral-200 bg-white hover:shadow-md dark:border-neutral-800 dark:bg-neutral-900",
       ].join(" ")}
     >
-      <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-indigo-500/10 blur-2xl" />
       <div className="mb-3 inline-flex items-center gap-2">
-        <span className="grid h-9 w-9 place-items-center rounded-xl bg-indigo-600/10 text-indigo-600 dark:text-indigo-400">
+        <span className="grid h-9 w-9 place-items-center rounded-xl bg-indigo-600 text-white dark:bg-indigo-500">
           <Icon className="h-4 w-4" />
         </span>
-        <h4 className="text-lg font-semibold">{title}</h4>
+        <h4 className="text-lg font-semibold text-neutral-900 dark:text-white">{title}</h4>
       </div>
       <p className="text-sm text-neutral-600 dark:text-neutral-400">{desc}</p>
       <ul className="mt-4 grid gap-2 text-sm">
         {bullets.map((b, j) => (
           <li key={j} className="flex items-center gap-2">
             <ShieldCheck className="h-4 w-4 text-emerald-500" />
-            <span>{b}</span>
+            <span className="text-neutral-700 dark:text-neutral-300">{b}</span>
           </li>
         ))}
       </ul>
-      <div className="mt-5 rounded-xl border border-neutral-200/70 bg-white/60 p-3 backdrop-blur-sm dark:border-neutral-800 dark:bg-neutral-900/50">
+      <div className="mt-5 rounded-xl border border-neutral-200 bg-white p-3 dark:border-neutral-800 dark:bg-neutral-900">
         <MiniBars />
       </div>
     </motion.div>
@@ -287,7 +432,7 @@ function TabCard({
 }
 
 /** ---------------------------------------
- *  Chat Preview chip
+ *  Chat Preview chip (unchanged)
  * -------------------------------------- */
 function ChatPreview() {
   return (
@@ -296,11 +441,10 @@ function ChatPreview() {
       custom={3}
       initial="hidden"
       animate="visible"
-      className="relative rounded-2xl border border-neutral-200 bg-white/70 p-4 shadow-sm ring-1 ring-black/0 backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/60"
+      className="relative rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-900"
     >
-      <div className="absolute inset-x-0 -top-10 mx-auto h-24 w-24 rounded-full bg-gradient-to-br from-indigo-500/30 to-emerald-500/30 blur-2xl" />
       <div className="space-y-3">
-        <div className="w-fit rounded-xl bg-neutral-100 px-3 py-2 text-[13px] dark:bg-neutral-800">
+        <div className="w-fit rounded-xl bg-neutral-100 px-3 py-2 text-[13px] text-neutral-800 dark:bg-neutral-800 dark:text-neutral-100">
           Hey! Your EU checkout errors dropped <span className="font-semibold text-emerald-600">−82%</span> after the
           edge patch. Great work!
         </div>
@@ -309,7 +453,7 @@ function ChatPreview() {
         </div>
       </div>
       <div className="mt-4 flex items-center justify-between">
-        <div className="text-xs text-neutral-500">Context-aware • Tone control</div>
+        <div className="text-xs text-neutral-500 dark:text-neutral-400">Context-aware • Tone control</div>
         <button className="inline-flex items-center gap-2 rounded-lg bg-neutral-900 px-3 py-1.5 text-xs text-white hover:opacity-90 dark:bg-white dark:text-neutral-900">
           Reply <ArrowRight className="h-3.5 w-3.5" />
         </button>
@@ -319,19 +463,318 @@ function ChatPreview() {
 }
 
 /** ---------------------------------------
+ *  Trust/Use-cases/Matrix/Testimonials (unchanged)
+ * -------------------------------------- */
+function TrustBar() {
+  const items = ["AcmeCo", "Globex", "Umbrella", "Initech", "Soylent", "Stark"];
+  return (
+    <div className="mt-8">
+      <div className="text-center text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+        Trusted by product teams at
+      </div>
+      <div className="mt-3 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-neutral-600 dark:text-neutral-300">
+        {items.map((n) => (
+          <span key={n} className="opacity-80 transition hover:opacity-100">{n}</span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function UseCaseChips({ items }: { items: string[] }) {
+  return (
+    <div className="mt-4 flex flex-wrap gap-2">
+      {items.map((u) => (
+        <span
+          key={u}
+          className="inline-flex items-center gap-1 rounded-full border border-neutral-200 bg-white px-3 py-1.5 text-xs text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:bg-neutral-800"
+        >
+          <Zap className="h-3.5 w-3.5 text-amber-500" />
+          {u}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function FeatureMatrix({ activeKey }: { activeKey: TabKey }) {
+  const rows = [
+    { k: "ai", items: ["Explainable AI", "Anomaly Alerts", "Churn Predict", "SQL-free"] },
+    { k: "reporting", items: ["Snapshots", "Share Links", "PDF Export", "Audit Trail"] },
+    { k: "chat", items: ["Tone Profiles", "Quick Actions", "Presence", "Shortcuts"] },
+    { k: "stack", items: ["Memberships", "RBAC", "Usage Limits", "Webhooks"] },
+  ];
+  const current = rows.find((r) => r.k === activeKey)?.items ?? [];
+  return (
+    <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-4 text-sm dark:border-neutral-800 dark:bg-neutral-900">
+      <div className="mb-2 font-medium text-neutral-900 dark:text-neutral-100">What’s included</div>
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        {current.map((item) => (
+          <div key={item} className="flex items-center gap-2">
+            <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+            <span className="text-neutral-700 dark:text-neutral-300">{item}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function TestimonialStrip() {
+  const cards = [
+    { name: "Amira", role: "PM @ AcmeCo", quote: "Cut our reporting prep from hours to minutes." },
+    { name: "Liam", role: "Support Lead @ Umbrella", quote: "CSAT up 4 points after rolling out chat." },
+    { name: "Rin", role: "Data @ Globex", quote: "AI insights catch things our dashboards miss." },
+  ];
+  return (
+    <div className="mt-10 grid gap-4 sm:grid-cols-3">
+      {cards.map((c, i) => (
+        <motion.div
+          key={c.name}
+          variants={tiltIn}
+          custom={i}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+          className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-900"
+        >
+          <div className="flex items-center gap-3">
+            <div className="grid h-9 w-9 place-items-center rounded-full bg-indigo-600/10 text-indigo-600 dark:text-indigo-300">
+              <Users className="h-4 w-4" />
+            </div>
+            <div>
+              <div className="text-sm font-medium text-neutral-900 dark:text-neutral-100">{c.name}</div>
+              <div className="text-xs text-neutral-500 dark:text-neutral-400">{c.role}</div>
+            </div>
+            <div className="ml-auto flex items-center gap-1 text-amber-500">
+              <Star className="h-4 w-4 fill-current" />
+              <Star className="h-4 w-4 fill-current" />
+              <Star className="h-4 w-4 fill-current" />
+              <Star className="h-4 w-4 fill-current" />
+              <Star className="h-4 w-4 fill-current" />
+            </div>
+          </div>
+          <p className="mt-3 text-sm text-neutral-700 dark:text-neutral-300">“{c.quote}”</p>
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+
+/** ---------------------------------------
+ *  NEW: Segmented Carousel Tabs (mobile/tablet)
+ * -------------------------------------- */
+function SegmentedTabs({
+  activeKey,
+  setActiveKey,
+  onKeyDown,
+}: {
+  activeKey: TabKey;
+  setActiveKey: (k: TabKey) => void;
+  onKeyDown: (e: React.KeyboardEvent) => void;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const btnRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+
+  const [pill, setPill] = useState<{ left: number; width: number }>({ left: 0, width: 0 });
+
+  const updatePill = useCallback(() => {
+    const container = containerRef.current;
+    const btn = btnRefs.current[activeKey];
+    if (!container || !btn) return;
+    const cRect = container.getBoundingClientRect();
+    const bRect = btn.getBoundingClientRect();
+    setPill({ left: bRect.left - cRect.left, width: bRect.width });
+  }, [activeKey]);
+
+  useLayoutEffect(() => {
+    updatePill();
+    const handle = () => updatePill();
+    window.addEventListener("resize", handle);
+    return () => window.removeEventListener("resize", handle);
+  }, [updatePill]);
+
+  useEffect(() => {
+    const btn = btnRefs.current[activeKey];
+    btn?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+  }, [activeKey]);
+
+  const statFor = (k: TabKey) => {
+    const t = TABS.find((x: any) => x.key === k);
+    return (t?.bullets?.length ?? 0) + (t?.useCases?.length ?? 0);
+  };
+
+  return (
+    <div
+      role="tablist"
+      aria-label="Feature tabs"
+      ref={containerRef}
+      onKeyDown={onKeyDown}
+      className="relative mt-8 flex items-center gap-2 overflow-x-auto rounded-2xl border border-neutral-200 bg-white p-1.5 pb-2 shadow-sm dark:border-neutral-800 dark:bg-neutral-900 lg:hidden"
+    >
+      {/* animated pill */}
+      <motion.div
+        layout
+        className="pointer-events-none absolute top-1.5 h-[calc(100%-12px)] rounded-xl bg-neutral-900 dark:bg-white"
+        style={{ left: pill.left, width: pill.width }}
+        transition={{ type: "spring", stiffness: 350, damping: 30 }}
+      />
+      {TABS.map((t: any) => {
+        const active = t.key === activeKey;
+        return (
+          <button
+            key={t.key}
+            ref={(el:any) => (btnRefs.current[t.key] = el)}
+            role="tab"
+            aria-selected={active}
+            aria-controls={`panel-${t.key}`}
+            id={`tab-${t.key}`}
+            onClick={() => setActiveKey(t.key)}
+            className={[
+              "relative z-10 flex shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-sm transition-colors",
+              active
+                ? "text-white dark:text-neutral-900"
+                : "text-neutral-700 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white",
+            ].join(" ")}
+          >
+            <t.icon className="h-4 w-4" />
+            <span>{t.label}</span>
+            <span
+              className={[
+                "ml-1 inline-flex items-center justify-center rounded-full px-1.5 text-[10px] font-semibold",
+                active
+                  ? "bg-white/20 text-white dark:bg-neutral-900/15 dark:text-neutral-900"
+                  : "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300",
+              ].join(" ")}
+            >
+              {statFor(t.key)}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/** ---------------------------------------
+ *  NEW: Vertical Rail Tabs (desktop)
+ *  - Animated background card (layoutId)
+ *  - Progress rail
+ *  - Sublabel + stat chip
+ * -------------------------------------- */
+function TabRail({
+  activeKey,
+  setActiveKey,
+  onKeyDown,
+}: {
+  activeKey: TabKey;
+  setActiveKey: (k: TabKey) => void;
+  onKeyDown: (e: React.KeyboardEvent) => void;
+}) {
+  const statFor = (k: TabKey) => {
+    const t = TABS.find((x: any) => x.key === k);
+    return (t?.bullets?.length ?? 0) + (t?.useCases?.length ?? 0);
+  };
+
+  return (
+    <div
+      className="sticky top-20 hidden lg:block"
+      role="tablist"
+      aria-label="Feature tabs"
+      onKeyDown={onKeyDown}
+    >
+      <div className="relative">
+        {/* vertical rail line */}
+        <div
+          aria-hidden
+          className="absolute left-4 top-0 h-full w-[2px] rounded bg-neutral-200 dark:bg-neutral-800"
+        />
+        <div className="space-y-2">
+          {TABS.map((t: any) => {
+            const active = t.key === activeKey;
+            return (
+              <div key={t.key} className="relative pl-8">
+                {/* node on rail */}
+                <span
+                  aria-hidden
+                  className={[
+                    "absolute left-3 top-1/2 z-10 h-2.5 w-2.5 -translate-y-1/2 rounded-full ring-4 transition",
+                    active
+                      ? "bg-indigo-500 ring-indigo-100 dark:ring-indigo-900/40"
+                      : "bg-neutral-300 ring-white dark:bg-neutral-700 dark:ring-neutral-900",
+                  ].join(" ")}
+                />
+                <button
+                  id={`tab-${t.key}`}
+                  role="tab"
+                  aria-selected={active}
+                  aria-controls={`panel-${t.key}`}
+                  onClick={() => setActiveKey(t.key)}
+                  className="relative w-full text-left"
+                >
+                  {/* animated background card */}
+                  {active && (
+                    <motion.div
+                      layoutId="rail-bg"
+                      className="absolute inset-0 -z-10 rounded-2xl border border-indigo-500/50 bg-white shadow-md dark:border-indigo-600/40 dark:bg-neutral-900"
+                      transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                    />
+                  )}
+                  <div className="flex items-center justify-between rounded-2xl px-4 py-3">
+                    <div className="flex items-center gap-3">
+                      <span
+                        className={[
+                          "grid h-9 w-9 place-items-center rounded-xl",
+                          active
+                            ? "bg-indigo-600 text-white"
+                            : "bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300",
+                        ].join(" ")}
+                      >
+                        <t.icon className="h-4 w-4" />
+                      </span>
+                      <div>
+                        <div
+                          className={[
+                            "font-medium",
+                            active ? "text-neutral-900 dark:text-white" : "text-neutral-800 dark:text-neutral-100",
+                          ].join(" ")}
+                        >
+                          {t.label}
+                        </div>
+                        <div className="text-xs text-neutral-500 dark:text-neutral-400">{t.sublabel}</div>
+                      </div>
+                    </div>
+                    <div
+                      className={[
+                        "inline-flex items-center gap-1 rounded-full px-2 py-1 text-[11px] font-semibold",
+                        active
+                          ? "bg-indigo-50 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-300"
+                          : "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300",
+                      ].join(" ")}
+                    >
+                      {statFor(t.key)} items
+                    </div>
+                  </div>
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** ---------------------------------------
  *  CTA Row
  * -------------------------------------- */
-function CTARow({
-  items,
-}: {
-  items: { label: string; icon: any }[];
-}) {
+function CTARow({ items }: { items: { label: string; icon: any }[] }) {
   return (
     <div className="flex flex-wrap gap-2">
       {items.map(({ label, icon: Icon }, idx) => (
         <button
           key={idx}
-          className="inline-flex items-center gap-2 rounded-xl border border-neutral-200 bg-white px-3 py-2 text-xs font-medium hover:bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:bg-neutral-800"
+          className="inline-flex items-center gap-2 rounded-xl border border-neutral-200 bg-white px-3 py-2 text-xs font-medium text-neutral-800 hover:bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:bg-neutral-800"
         >
           <Icon className="h-3.5 w-3.5" />
           {label}
@@ -342,14 +785,15 @@ function CTARow({
 }
 
 /** ---------------------------------------
- *  Main Section
+ *  Main Section (modern + unique + responsive + contentful)
  * -------------------------------------- */
 export default function FeatureSectionNeo() {
   const ref = useRef<HTMLDivElement>(null);
   const [activeKey, setActiveKey] = useState<TabKey>("ai");
+  const shouldReduce = useReducedMotion();
 
   // Keyboard nav for a11y (Left/Right, Home/End)
-  const tabKeys = TABS.map((t:any) => t.key);
+  const tabKeys = TABS.map((t: any) => t.key);
   const onKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       const i = tabKeys.indexOf(activeKey);
@@ -366,287 +810,281 @@ export default function FeatureSectionNeo() {
     [activeKey, tabKeys]
   );
 
-  // Optional: simple auto-rotate on md+ screens (pause on hover)
+  // Optional: auto-rotate on md+ screens (pause on hover)
   const [paused, setPaused] = useState(false);
   useEffect(() => {
+    if (shouldReduce) return;
     const mql = typeof window !== "undefined" ? window.matchMedia("(min-width: 768px)") : null;
     if (!mql?.matches) return;
     const id = setInterval(() => {
       if (paused) return;
-      setActiveKey((prev:any) => {
+      setActiveKey((prev: any) => {
         const idx = tabKeys.indexOf(prev);
         return tabKeys[(idx + 1) % tabKeys.length] as TabKey;
       });
     }, 6000);
     return () => clearInterval(id);
-  }, [paused, tabKeys]);
+  }, [paused, tabKeys, shouldReduce]);
 
-  const activeTab = TABS.find((t:any) => t.key === activeKey)!;
+  const activeTab = TABS.find((t: any) => t.key === activeKey)!;
 
   return (
     <section
       ref={ref}
-      className="relative mx-auto px-4 py-16 sm:px-6 lg:px-8 bg-gradient-to-br from-indigo-600 via-purple-600 to-fuchsia-600 dark:from-slate-900 dark:via-gray-900 dark:to-indigo-950 text-white"
+      className="relative overflow-hidden"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      {/* Deep backdrop w/ navy gradient for extra depth */}
+      {/* Background */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 [mask-image:radial-gradient(60%_50%_at_50%_0%,#000,transparent)]"
-      >
-        <div className="absolute inset-0 bg-[radial-gradient(60%_60%_at_50%_0%,rgba(99,102,241,0.25),transparent_60%)]" />
-        <div className="absolute inset-x-0 top-1/3 h-px bg-gradient-to-r from-transparent via-neutral-200 to-transparent dark:via-neutral-800" />
-      </div>
-
-      {/* Header */}
-      <div className="text-center">
-        <TimelineContent
-          as="h2"
-          animationNum={0}
-          timelineRef={ref}
-          customVariants={fadeUp}
-          className="text-balance text-3xl font-semibold sm:text-4xl md:text-5xl"
-        >
-          A smarter, calmer feature suite
-        </TimelineContent>
-        <TimelineContent
-          as="p"
-          animationNum={1}
-          timelineRef={ref}
-          customVariants={fadeUp}
-          className="mx-auto mt-3 max-w-2xl text-pretty text-sm text-neutral-600 sm:text-base dark:text-neutral-400"
-        >
-          Composable building blocks for memberships, chat, AI insights, and visual reporting—designed to feel fast and
-          look beautiful.
-        </TimelineContent>
-
-        {/* Badges */}
-        <motion.div
-          className="mt-6 flex flex-wrap items-center justify-center gap-2"
-          variants={fadeUp}
-          custom={2}
-          initial="hidden"
-          animate="visible"
-        >
-          <Badge icon={Sparkles} text="AI-assisted" />
-          <Badge icon={Layers} text="Composable" />
-          <Badge icon={ShieldCheck} text="Enterprise-ready" />
-        </motion.div>
-
-        {/* Integrations ribbon */}
-        <motion.div
-          variants={fadeUp}
-          custom={3}
-          initial="hidden"
-          animate="visible"
-          className="mx-auto mt-5 flex flex-wrap items-center justify-center gap-2"
-        >
-          {activeTab.integrations.map((n:any) => (
-            <IntegrationChip key={n} name={n} />
-          ))}
-        </motion.div>
-      </div>
-
-      {/* Metrics rail */}
-      <motion.div
-        className="mx-auto mt-10 grid max-w-5xl grid-cols-2 gap-3 sm:grid-cols-4"
-        variants={fadeUp}
-        custom={4}
-        initial="hidden"
-        animate="visible"
-      >
-        <Metric value="10M+" label="Sessions analyzed" hint="+3.2% WoW" trend="up" />
-        <Metric value="98.9%" label="CSAT with chat" hint="+0.7% MoM" trend="up" />
-        <Metric value="45s" label="Time-to-insight" hint="−12s vs last week" trend="up" />
-        <Metric value="15+" label="Building blocks" />
-      </motion.div>
-
-      {/* Mobile tab pills */}
+        className="absolute inset-0 -z-10 bg-gradient-to-b from-indigo-50 via-white to-indigo-100 dark:from-[#0b1220] dark:via-[#0c1633] dark:to-[#0d1b3a]"
+      />
       <div
-        role="tablist"
-        aria-label="Feature tabs"
-        onKeyDown={onKeyDown}
-        className="mt-8 flex gap-2 overflow-x-auto pb-2 lg:hidden"
-      >
-        {TABS.map((t:any) => {
-          const active = t.key === activeKey;
-          return (
-            <button
-              key={t.key}
-              role="tab"
-              aria-selected={active}
-              aria-controls={`panel-${t.key}`}
-              id={`tab-${t.key}`}
-              onClick={() => setActiveKey(t.key)}
-              className={[
-                "flex shrink-0 items-center gap-2 rounded-full border px-3 py-2 text-sm",
-                active
-                  ? "border-indigo-400 bg-indigo-50 text-indigo-700 dark:border-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-300"
-                  : "border-neutral-200 bg-white/70 text-neutral-700 hover:bg-white dark:border-neutral-800 dark:bg-neutral-900/60 dark:text-neutral-300",
-              ].join(" ")}
-            >
-              <t.icon className="h-4 w-4" />
-              {t.label}
-            </button>
-          );
-        })}
-      </div>
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10 opacity-40 mix-blend-multiply dark:opacity-30"
+        style={{
+          background:
+            "radial-gradient(600px 280px at 10% 5%, rgba(99,102,241,0.15), transparent 60%), radial-gradient(600px 280px at 90% 10%, rgba(16,185,129,0.12), transparent 60%)",
+        }}
+      />
 
-      {/* Content grid */}
-      <div className="mt-8 grid grid-cols-12 gap-6">
-        {/* Left: Tabs list (desktop) */}
-        <motion.aside
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-20 lg:px-8 lg:py-24">
+        {/* Header */}
+        <div className="text-center">
+          <TimelineContent
+            as="h2"
+            animationNum={0}
+            timelineRef={ref}
+            customVariants={fadeUp}
+            className="text-balance text-3xl font-semibold text-neutral-900 sm:text-4xl md:text-5xl dark:text-white"
+          >
+            A smarter, calmer feature suite
+          </TimelineContent>
+          <TimelineContent
+            as="p"
+            animationNum={1}
+            timelineRef={ref}
+            customVariants={fadeUp}
+            className="mx-auto mt-3 max-w-2xl text-pretty text-sm text-neutral-600 sm:text-base dark:text-neutral-400"
+          >
+            Composable building blocks for memberships, chat, AI insights, and visual reporting—designed to feel fast and
+            look beautiful.
+          </TimelineContent>
+
+          {/* Badges */}
+          <motion.div
+            className="mt-6 flex flex-wrap items-center justify-center gap-2"
+            variants={fadeUp}
+            custom={2}
+            initial="hidden"
+            animate="visible"
+          >
+            <Badge icon={Sparkles} text="AI-assisted" />
+            <Badge icon={Layers} text="Composable" />
+            <Badge icon={ShieldCheck} text="Enterprise-ready" />
+          </motion.div>
+
+          {/* Integrations */}
+          <motion.div
+            variants={fadeUp}
+            custom={3}
+            initial="hidden"
+            animate="visible"
+            className="mx-auto mt-5 flex flex-wrap items-center justify-center gap-2"
+          >
+            {activeTab.integrations.map((n: any) => (
+              <IntegrationChip key={n} name={n} />
+            ))}
+          </motion.div>
+
+          {/* Trust bar */}
+          <TrustBar />
+        </div>
+
+        {/* Metrics rail */}
+        <motion.div
+          className="mx-auto mt-10 grid max-w-5xl grid-cols-2 gap-3 sm:grid-cols-4"
           variants={fadeUp}
-          custom={5}
+          custom={4}
           initial="hidden"
           animate="visible"
-          className="col-span-12 lg:col-span-4"
         >
-          <div
-            className="sticky top-20 hidden space-y-2 lg:block"
-            role="tablist"
-            aria-label="Feature tabs"
-            onKeyDown={onKeyDown}
-          >
-            {TABS.map((t:any) => {
+          <Metric value="10M+" label="Sessions analyzed" hint="+3.2% WoW" trend="up" />
+          <Metric value="98.9%" label="CSAT with chat" hint="+0.7% MoM" trend="up" />
+          <Metric value="45s" label="Time-to-insight" hint="−12s vs last week" trend="up" />
+          <Metric value="15+" label="Building blocks" />
+        </motion.div>
+
+        {/* NEW: Segmented carousel (mobile/tablet) */}
+        <SegmentedTabs
+          activeKey={activeKey}
+          setActiveKey={setActiveKey}
+          onKeyDown={onKeyDown}
+        />
+
+        {/* Content grid */}
+        <div className="mt-6 grid grid-cols-12 gap-6">
+          {/* NEW: Vertical rail (desktop) */}
+          <aside className="col-span-12 lg:col-span-4">
+            <TabRail
+              activeKey={activeKey}
+              setActiveKey={setActiveKey}
+              onKeyDown={onKeyDown}
+            />
+          </aside>
+
+          {/* Panels */}
+          <div className="col-span-12 space-y-6 lg:col-span-8">
+            {TABS.map((t: any, i: any) => {
               const active = t.key === activeKey;
               return (
-                <button
+                <motion.section
                   key={t.key}
-                  id={`tab-${t.key}`}
-                  role="tab"
-                  aria-selected={active}
-                  aria-controls={`panel-${t.key}`}
-                  onClick={() => setActiveKey(t.key)}
+                  id={`panel-${t.key}`}
+                  role="tabpanel"
+                  aria-labelledby={`tab-${t.key}`}
+                  variants={fadeUp}
+                  custom={6 + i}
+                  initial="hidden"
+                  animate={active ? "visible" : "hidden"}
                   className={[
-                    "group flex w-full items-center justify-between rounded-2xl border px-4 py-3 text-left transition-all",
+                    "grid grid-cols-12 gap-6 rounded-3xl border p-6 transition-all",
                     active
-                      ? "border-indigo-300/60 bg-white shadow-[0_10px_35px_-20px_rgba(99,102,241,0.45)] dark:border-indigo-600/40 dark:bg-neutral-900"
-                      : "border-neutral-200 bg-white/70 hover:bg-white dark:border-neutral-800 dark:bg-neutral-900/60",
+                      ? "border-neutral-200 bg-white shadow-xl dark:border-neutral-800 dark:bg-neutral-900"
+                      : "pointer-events-none hidden opacity-0",
                   ].join(" ")}
                 >
-                  <span className="flex items-center gap-3">
-                    <span className="grid h-9 w-9 place-items-center rounded-xl bg-indigo-600/10 text-indigo-600 dark:text-indigo-400">
-                      <t.icon className="h-4 w-4" />
-                    </span>
-                    <span className="font-medium">{t.label}</span>
-                  </span>
-                  <ArrowRight
-                    className={[
-                      "h-4 w-4 transition-transform",
-                      active ? "translate-x-0 rotate-0" : "-translate-x-1 group-hover:translate-x-0",
-                    ].join(" ")}
-                  />
-                </button>
+                  {/* Copy + bullets + CTAs */}
+                  <div className="col-span-12 md:col-span-6">
+                    <TabCard
+                      active
+                      icon={t.icon}
+                      title={t.title}
+                      desc={t.desc}
+                      bullets={t.bullets}
+                      i={0}
+                    />
+                    <UseCaseChips items={t.useCases ?? []} />
+                    <div className="mt-4">
+                      <CTARow items={t.ctas} />
+                    </div>
+                    <FeatureMatrix activeKey={t.key} />
+                  </div>
+
+                  {/* Visual preview area */}
+                  <div className="col-span-12 md:col-span-6">
+                    {t.key === "ai" && (
+                      <motion.div
+                        variants={shouldReduce ? undefined : floatY}
+                        initial={shouldReduce ? undefined : "initial"}
+                        animate={shouldReduce ? undefined : "animate"}
+                        className="grid h-full place-items-center rounded-2xl border border-indigo-200 bg-indigo-50 p-6 dark:border-indigo-900 dark:bg-indigo-950"
+                      >
+                        <div className="max-w-sm text-center">
+                          <div className="mx-auto mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-indigo-600 text-white">
+                            <Bot className="h-5 w-5" />
+                          </div>
+                          <p className="text-sm text-neutral-700 dark:text-neutral-300">
+                            “Top drivers for churn this week: <b>slow checkout</b>, <b>coupon conflicts</b>, and
+                            <b> stockouts</b>. Predicted risk: <span className="text-amber-600">↑ 12%</span>.”
+                          </p>
+                          <button className="mt-4 inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs text-white hover:bg-indigo-700">
+                            Try a sample insight <ArrowUpRight className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {t.key === "reporting" && (
+                      <div className="rounded-2xl border border-neutral-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-900">
+                        {/* Header controls */}
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-neutral-900 dark:text-neutral-100">Revenue dashboard</span>
+                            <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[11px] text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">
+                              Live snapshot
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button className="rounded-md border border-neutral-200 px-2 py-1 text-xs text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800">
+                              Last 30 days
+                            </button>
+                            <button className="inline-flex items-center gap-1 rounded-md border border-neutral-200 px-2 py-1 text-xs text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800">
+                              <Share2 className="h-3.5 w-3.5" /> Share
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Charts row */}
+                        <div className="mt-5 grid grid-cols-12 gap-4">
+                          <div className="col-span-12 md:col-span-8">
+                            <AreaChart data={useMemo(() => [28,32,31,35,38,36,40,44,43,48,52,50,54,59,61], [])} />
+                            <div className="mt-2 flex items-center gap-3 text-xs text-neutral-500 dark:text-neutral-400">
+                              <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-indigo-500" /> Gross MRR</span>
+                              <span>•</span>
+                              <span>Weekly cadence</span>
+                            </div>
+                          </div>
+                          <div className="col-span-12 md:col-span-4">
+                            <DonutChart />
+                          </div>
+                        </div>
+
+                        {/* KPIs */}
+                        <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                          <KpiCard label="MRR" value="$128k" hint="+6.2% WoW" data={useMemo(() => [82,84,86,90,94,98,102,108,112,116,120,128], [])} />
+                          <KpiCard label="ARPA" value="$72" hint="+2.1% MoM" data={useMemo(() => [60,61,61,63,64,66,66,67,69,70,71,72], [])} />
+                          <KpiCard label="New logos" value="143" hint="+12 this week" data={useMemo(() => [88,91,96,92,98,101,108,112,118,123,139,143], [])} />
+                        </div>
+
+                        {/* Footer */}
+                        <div className="mt-4 flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400">
+                          <span>Auto-export to PDF & Slack</span>
+                          <button className="inline-flex items-center gap-1 rounded-md border border-neutral-200 px-2 py-1 text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800">
+                            <Share2 className="h-3.5 w-3.5" /> Get a share link
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+
+                    {t.key === "chat" && <ChatPreview />}
+
+                    {t.key === "stack" && (
+                      <motion.div
+                        variants={tiltIn}
+                        custom={2}
+                        initial="hidden"
+                        animate="visible"
+                        className="grid grid-cols-2 gap-3"
+                      >
+                        {[
+                          { k: "Memberships", d: "Monthly, trial, yearly" },
+                          { k: "RBAC", d: "Roles & permissions" },
+                          { k: "Usage", d: "Rate limits & quotas" },
+                          { k: "Webhooks", d: "Sync external tools" },
+                        ].map((b, idx) => (
+                          <div
+                            key={idx}
+                            className="rounded-xl border border-neutral-200 bg-white p-4 text-sm dark:border-neutral-800 dark:bg-neutral-900"
+                          >
+                            <div className="mb-1 font-medium text-neutral-900 dark:text-neutral-100">{b.k}</div>
+                            <div className="text-neutral-500 dark:text-neutral-400">{b.d}</div>
+                          </div>
+                        ))}
+                      </motion.div>
+                    )}
+                  </div>
+                </motion.section>
               );
             })}
           </div>
-        </motion.aside>
-
-        {/* Right: Active panel */}
-        <div className="col-span-12 space-y-6 lg:col-span-8">
-          {TABS.map((t:any, i:any) => {
-            const active = t.key === activeKey;
-            return (
-              <motion.section
-                key={t.key}
-                id={`panel-${t.key}`}
-                role="tabpanel"
-                aria-labelledby={`tab-${t.key}`}
-                variants={fadeUp}
-                custom={6 + i}
-                initial="hidden"
-                animate={active ? "visible" : "hidden"}
-                className={[
-                  "grid grid-cols-12 gap-6 rounded-3xl border p-6 transition-all",
-                  active
-                    ? "border-neutral-200 bg-white/80 shadow-xl backdrop-blur-md dark:border-neutral-800 dark:bg-neutral-900/70"
-                    : "pointer-events-none hidden opacity-0",
-                ].join(" ")}
-              >
-                {/* Copy + bullets + CTAs */}
-                <div className="col-span-12 md:col-span-6">
-                  <TabCard
-                    active
-                    icon={t.icon}
-                    title={t.title}
-                    desc={t.desc}
-                    bullets={t.bullets}
-                    i={0}
-                  />
-                  <div className="mt-4">
-                    <CTARow items={t.ctas} />
-                  </div>
-                </div>
-
-                {/* Visual preview area changes per tab */}
-                <div className="col-span-12 md:col-span-6">
-                  {t.key === "ai" && (
-                    <motion.div
-                      variants={floatY}
-                      initial="initial"
-                      animate="animate"
-                      className="grid h-full place-items-center rounded-2xl border border-dashed border-indigo-300/50 bg-gradient-to-br from-indigo-50 to-emerald-50 p-6 dark:from-indigo-950/40 dark:to-emerald-950/30"
-                    >
-                      <div className="max-w-sm text-center">
-                        <div className="mx-auto mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-indigo-600 text-white">
-                          <Bot className="h-5 w-5" />
-                        </div>
-                        <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                          “Top drivers for churn this week: <b>slow checkout</b>, <b>coupon conflicts</b>, and
-                          <b> stockouts</b>. Predicted risk: <span className="text-amber-600">↑ 12%</span>.”
-                        </p>
-                      </div>
-                    </motion.div>
-                  )}
-
-                  {t.key === "reporting" && (
-                    <div className="rounded-2xl border border-neutral-200 bg-white/70 p-5 backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/60">
-                      <MiniBars />
-                      <div className="mt-3 flex items-center justify-between text-xs text-neutral-500">
-                        <span>Live snapshot • Shareable link</span>
-                        <button className="inline-flex items-center gap-1 rounded-md border px-2 py-1 hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-800">
-                          <Share2 className="h-3.5 w-3.5" /> Share
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  {t.key === "chat" && <ChatPreview />}
-
-                  {t.key === "stack" && (
-                    <motion.div
-                      variants={tiltIn}
-                      custom={2}
-                      initial="hidden"
-                      animate="visible"
-                      className="grid grid-cols-2 gap-3"
-                    >
-                      {[
-                        { k: "Memberships", d: "Monthly, trial, yearly" },
-                        { k: "RBAC", d: "Roles & permissions" },
-                        { k: "Usage", d: "Rate limits & quotas" },
-                        { k: "Webhooks", d: "Sync external tools" },
-                      ].map((b, idx) => (
-                        <div
-                          key={idx}
-                          className="rounded-xl border border-neutral-200 bg-white/70 p-4 text-sm backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/60"
-                        >
-                          <div className="mb-1 font-medium">{b.k}</div>
-                          <div className="text-neutral-500">{b.d}</div>
-                        </div>
-                      ))}
-                    </motion.div>
-                  )}
-                </div>
-              </motion.section>
-            );
-          })}
         </div>
+
+        {/* Social proof */}
+        <TestimonialStrip />
       </div>
     </section>
   );
 }
-
-
