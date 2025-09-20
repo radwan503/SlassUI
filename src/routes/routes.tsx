@@ -29,7 +29,6 @@ const routes = [
     layout: MainLayout,
     component: lazy(() => import("../pages/Template/Template")),
   },
-  
 ];
 
 export default routes;

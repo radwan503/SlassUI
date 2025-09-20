@@ -45,7 +45,7 @@ const MainLayout = ({ children }: any) => {
 
       {/* Main Content */}
       <main
-        className="mt-16 flex-1 h-screen overflow-y-auto bg-gray-50 dark:bg-gray-900"
+        className="flex-1 h-screen overflow-y-auto bg-gray-50 dark:bg-gray-900"
         style={{ height: "calc(100vh - 0px)" }}
       >
         {children}

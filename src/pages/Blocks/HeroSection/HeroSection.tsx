@@ -81,7 +81,7 @@ const heroSections = [
 
 const HeroSectionPage = () => {
   return (
-    <section className="relative bg-primary py-10 md:py-10 overflow-hidden">
+    <section className="relative bg-primary py-20 md:py-24 overflow-hidden">
       <div className="container mx-auto px-4 text-center md:text-left relative z-10">
         {/* Top Section Header */}
         <div className="mb-12">

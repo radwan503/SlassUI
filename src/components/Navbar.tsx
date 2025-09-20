@@ -19,8 +19,8 @@ type Props = {
 const NAV_LINKS = [
   { label: "Home", to: "/" },
   { label: "Docs", to: "/docs" },
-  { label: "Templates", to: "/templates" },
-  { label: "Components", to: "/components" },
+  { label: "Templates", to: "/template" },
+  { label: "Components", to: "/ui-blocks" },
   { label: "Pricing", to: "/pricing" },
   { label: "Blog", to: "/blog" },
 ];
@@ -71,9 +71,9 @@ const Navbar: React.FC<Props> = ({ toggleSidebar, toggleNav, navOpen }) => {
         "border-b border-white/10",
         "text-white",
         // Blue-dark glass gradient
-        "bg-[rgba(0,30,107,0.6)]",
+        "bg-[rgba(0,14,49,0.6)]",
         "before:pointer-events-none before:absolute before:inset-0 before:-z-10",
-        //"before:bg-[radial-gradient(1200px_600px_at_10%_-10%,rgba(59,130,246,0.20),transparent_60%),radial-gradient(900px_500px_at_90%_-20%,rgba(14,165,233,0.12),transparent_60%)]",
+        "before:bg-[radial-gradient(1200px_600px_at_10%_-10%,rgba(59,130,246,0.10),transparent_60%),radial-gradient(900px_500px_at_90%_-20%,rgba(14,165,233,0.12),transparent_60%)]",
         scrolled ? "shadow-[0_8px_30px_rgba(2,6,23,0.35)]" : "shadow-none",
       ].join(" ")}
     >
@@ -138,13 +138,13 @@ const Navbar: React.FC<Props> = ({ toggleSidebar, toggleNav, navOpen }) => {
           </button>
 
           {/* socials */}
-          <IconLink href="https://github.com/your-org" label="GitHub">
+          <IconLink href="https://github.com/radwan503/SlassUI" label="GitHub">
             <Github size={18} />
           </IconLink>
-          <IconLink href="https://www.linkedin.com/in/your-handle" label="LinkedIn">
+          <IconLink href="https://www.linkedin.com/company/slasstech-solutions" label="LinkedIn">
             <Linkedin size={18} />
           </IconLink>
-          <IconLink href="https://www.reddit.com/r/yourSubreddit" label="Reddit">
+          <IconLink href="https://radwananik.netlify.app/" label="Portfolio">
             <RedoDot size={18} />
           </IconLink>
 

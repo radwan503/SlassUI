@@ -4,6 +4,7 @@ import routes from "./routes/routes";
 import './App.css';
 import { ThemeProvider } from "./utils/ThemeContext";
 import Loader from "./components/Common/Loader";
+import NotFound from "./pages/not-found";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
               }
             />
           ))}
+           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
     </ThemeProvider>

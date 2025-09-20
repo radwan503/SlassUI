@@ -67,7 +67,7 @@ export default function AngledPanelBackground() {
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-slate-300">
               <Sparkles className="h-3.5 w-3.5" />
-              New in v1.1
+              New in v1.0
               <span className="text-cyan-300">160+ blocks</span>
             </div>
 
